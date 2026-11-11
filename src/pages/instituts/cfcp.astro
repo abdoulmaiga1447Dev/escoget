@@ -1,0 +1,159 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import EntetePage from '../../components/EntetePage.astro';
+import { etablissement } from '../../data/etablissement';
+
+const cfcp = etablissement.instituts.find((i) => i.sigle === 'CFCP')!;
+
+// Missions décrites dans les dossiers d'homologation (section CFCP).
+const missions = [
+  {
+    titre: 'Formation continue',
+    texte: 'Développer les compétences des salariés et des cadres, avec des formations immédiatement opérationnelles.',
+    detail: [
+      'Stages inter-entreprises : des participants de plusieurs entreprises, pour croiser les expériences.',
+      'Formations sur mesure : des programmes conçus pour une entreprise, à partir de ses besoins et de cas réels.',
+    ],
+  },
+  {
+    titre: 'Études et conseil',
+    texte: 'Accompagner les entreprises dans leurs projets, avec des consultants issus de plusieurs univers professionnels.',
+    detail: ['Études et missions de conseil pour les entreprises commerciales, industrielles et technologiques.'],
+  },
+  {
+    titre: 'Recrutement et placement',
+    texte: 'Mettre en relation les entreprises qui recrutent et les diplômés de l’Université.',
+    detail: ['Préparation des étudiants : CV, lettre de motivation, entretiens, tests.', 'Placement en stage et en emploi.'],
+  },
+];
+---
+
+<BaseLayout titre="CFCP · Formation continue" description="Le CFCP, Cabinet de Formation, de Conseils et de Placement de l’Université ESCOGET : formation continue, conseil aux entreprises, recrutement et placement.">
+  <EntetePage
+    titre={cfcp.nom}
+    surtitre="CFCP · Formation continue et entreprises"
+    intro="Le CFCP accompagne les entreprises et leurs salariés : formation continue, études et conseil, recrutement et placement des diplômés."
+    ariane={[{ libelle: 'Instituts', lien: '/instituts' }, { libelle: 'CFCP' }]}
+    image={{ id: 'ACC-04', sujet: 'Séminaire de formation professionnelle : adultes en tenue de bureau autour d’une table' }}
+  >
+    <div class="actions entree" style="--delai:0.18s">
+      <a class="bouton bouton-principal" href="/contact?objet=formation-continue">Demander une formation</a>
+    </div>
+  </EntetePage>
+
+  <section class="section">
+    <div class="conteneur">
+      <div class="entete-section" data-revele>
+        <h2>Trois métiers au service des entreprises</h2>
+      </div>
+      <div class="missions">
+        {
+          missions.map((m) => (
+            <article data-revele>
+              <h3>{m.titre}</h3>
+              <p class="texte">{m.texte}</p>
+              <ul>{m.detail.map((d) => <li>{d}</li>)}</ul>
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-douce">
+    <div class="conteneur garanties">
+      <div data-revele="gauche">
+        <h2>Un cabinet agréé depuis 1986</h2>
+      </div>
+      <ul data-revele="droite">
+        {cfcp.pointsForts.map((p) => <li>{p}</li>)}
+        <li>Direction : {cfcp.responsable.nom}</li>
+      </ul>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .actions {
+    margin-top: var(--e-4);
+  }
+
+  .missions {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--e-3);
+  }
+
+  .missions article {
+    display: grid;
+    align-content: start;
+    gap: var(--e-2);
+    padding: var(--e-4);
+    border: 1px solid var(--filet);
+    border-radius: var(--rayon);
+    transition:
+      border-color 0.3s,
+      translate 0.2s ease,
+      box-shadow 0.3s;
+  }
+
+  .missions article:hover {
+    border-color: var(--bleu);
+    translate: 0 -2px;
+    box-shadow: 0 18px 34px -24px rgb(9 20 59 / 0.5);
+  }
+
+  .num {
+    font-size: var(--taille-xl);
+    font-weight: 750;
+    color: var(--rouge);
+  }
+
+  .texte {
+    color: var(--encre-douce);
+  }
+
+  .missions ul {
+    display: grid;
+    gap: 0.5rem;
+    margin: 0;
+    padding-left: 1.1rem;
+    font-size: var(--taille-s);
+  }
+
+  .garanties {
+    display: grid;
+    grid-template-columns: 0.8fr 1.2fr;
+    gap: var(--e-6);
+    align-items: start;
+  }
+
+  .garanties h2 {
+    margin-top: var(--e-2);
+    font-size: var(--taille-xl);
+  }
+
+  .garanties ul {
+    display: grid;
+    gap: var(--e-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .garanties li {
+    padding: var(--e-2) var(--e-3);
+    background: #fff;
+    border-left: 4px solid var(--bleu);
+    border-radius: 0 var(--rayon) var(--rayon) 0;
+    font-weight: 600;
+  }
+
+  @media (max-width: 900px) {
+    .missions,
+    .garanties {
+      grid-template-columns: 1fr;
+      gap: var(--e-3);
+    }
+  }
+</style>

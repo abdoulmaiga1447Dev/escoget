@@ -1,0 +1,125 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import EntetePage from '../../components/EntetePage.astro';
+import ImageSlot from '../../components/ImageSlot.astro';
+import { etablissement } from '../../data/etablissement';
+import { formations } from '../../data/formations';
+
+const images: Record<string, { id: string; sujet: string }> = {
+  IHECG: { id: 'ACC-02', sujet: 'Cours de gestion : étudiants en tenue soignée suivant une présentation sur écran' },
+  IHET: { id: 'ACC-03', sujet: 'Travaux pratiques : étudiants en salle informatique, réseaux ou électrotechnique' },
+  CFCP: { id: 'ACC-04', sujet: 'Séminaire de formation professionnelle : adultes en tenue de bureau autour d’une table' },
+};
+const nbFormations = (sigle: string) => formations.filter((f) => f.institut === sigle).length;
+---
+
+<BaseLayout titre="Nos instituts" description="Les instituts de l’Université ESCOGET : IHECG (commerce et gestion), IHET (technologies) et CFCP (formation continue et placement).">
+  <EntetePage
+    titre="Deux instituts et un cabinet de formation continue"
+    surtitre="Nos instituts"
+    intro="L’Université ESCOGET s’organise autour de deux instituts qui délivrent ses diplômes, et d’un cabinet tourné vers les entreprises."
+    ariane={[{ libelle: 'Instituts' }]}
+  />
+
+  <section class="section">
+    <div class="conteneur liste">
+      {
+        etablissement.instituts.map((inst, i) => (
+          <a class:list={['institut', { inverse: i % 2 === 1 }]} href={inst.lien} data-revele>
+            <div class="arche cadre-image">
+              <ImageSlot id={images[inst.sigle].id} format="paysage" sujet={images[inst.sigle].sujet} />
+            </div>
+            <div class="texte">
+              <p class="sigle">{inst.sigle} · depuis {inst.depuis}</p>
+              <h2>{inst.nom}</h2>
+              <p>{inst.texte}</p>
+              {nbFormations(inst.sigle) > 0 && <p class="compte">{nbFormations(inst.sigle)} formations, du BTS au Master</p>}
+              <span class="suite">Découvrir l’{inst.sigle}</span>
+            </div>
+          </a>
+        ))
+      }
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .liste {
+    display: grid;
+    gap: var(--e-6);
+  }
+
+  .institut {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--e-5);
+    align-items: center;
+    color: var(--encre);
+    text-decoration: none;
+  }
+
+  .institut.inverse .cadre-image {
+    order: 2;
+  }
+
+  .cadre-image {
+    overflow: hidden;
+    border-radius: var(--rayon);
+  }
+
+  .cadre-image :global(.image),
+  .cadre-image :global(.emplacement) {
+    border-radius: 0;
+    transition: transform 0.4s ease;
+  }
+
+  .institut:hover :global(.image) {
+    transform: scale(1.03);
+  }
+
+  .texte {
+    display: grid;
+    gap: var(--e-2);
+  }
+
+  .sigle {
+    color: var(--rouge);
+    font-weight: 700;
+    font-size: var(--taille-xs);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .texte h2 {
+    font-size: var(--taille-xl);
+  }
+
+  .texte p:not(.sigle):not(.compte) {
+    color: var(--encre-douce);
+  }
+
+  .compte {
+    font-weight: 650;
+    color: var(--bleu);
+  }
+
+  .suite {
+    font-weight: 650;
+    color: var(--bleu);
+  }
+
+  .institut:hover .suite {
+    color: var(--rouge);
+  }
+
+  @media (max-width: 860px) {
+    .institut {
+      grid-template-columns: 1fr;
+      gap: var(--e-3);
+    }
+
+    .institut.inverse .cadre-image {
+      order: 0;
+    }
+  }
+</style>

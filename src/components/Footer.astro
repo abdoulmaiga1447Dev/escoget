@@ -1,0 +1,135 @@
+---
+import { etablissement } from '../data/etablissement';
+import { menu } from '../data/navigation';
+
+const annee = new Date().getFullYear();
+---
+
+<footer class="pied">
+  <div class="conteneur grille">
+    <div class="col-marque">
+      <img src="/images/logo/logo-universite-escoget-blanc.svg" alt="Université ESCOGET" width="170" height="87" />
+      <p class="credo">« {etablissement.credo} »</p>
+    </div>
+
+    <div>
+      <h2 class="titre">Nous trouver</h2>
+      {
+        etablissement.campus.map((c) => (
+          <p class="campus">
+            <strong>{c.nom}</strong>
+            {c.adresse.map((ligne) => (
+              <>
+                <br />
+                {ligne}
+              </>
+            ))}
+          </p>
+        ))
+      }
+      <p>{etablissement.boitePostale}</p>
+    </div>
+
+    <div>
+      <h2 class="titre">Nous contacter</h2>
+      <ul class="liste">
+        {etablissement.telephones.map((t) => <li><a href={`tel:${t.replace(/\s/g, '')}`}>{t}</a></li>)}
+        <li><a href={`mailto:${etablissement.email}`}>{etablissement.email}</a></li>
+      </ul>
+    </div>
+
+    <nav aria-label="Liens du pied de page">
+      <h2 class="titre">Le site</h2>
+      <ul class="liste">
+        {menu.map((item) => <li><a href={item.lien}>{item.libelle}</a></li>)}
+      </ul>
+    </nav>
+  </div>
+
+  <div class="conteneur bas">
+    <p>© {annee} {etablissement.nom}. {etablissement.autorisation}.</p>
+    <a href="/mentions-legales">Mentions légales</a>
+  </div>
+</footer>
+
+<style>
+  .pied {
+    background: var(--bleu);
+    color: rgb(255 255 255 / 0.82);
+    font-size: var(--taille-s);
+    border-top: 6px solid var(--rouge);
+  }
+
+  .grille {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr 0.8fr;
+    gap: var(--e-5);
+    padding-block: var(--e-6) var(--e-5);
+  }
+
+  .col-marque img {
+    width: 170px;
+    margin-bottom: var(--e-3);
+  }
+
+  .credo {
+    max-width: 22rem;
+    font-style: italic;
+    line-height: 1.55;
+  }
+
+  .titre {
+    margin-bottom: var(--e-2);
+    color: #fff;
+    font-size: var(--taille-xs);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .campus {
+    margin-bottom: var(--e-2);
+  }
+
+  .campus strong {
+    color: #fff;
+  }
+
+  .liste {
+    display: grid;
+    gap: 0.4rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  a {
+    color: rgb(255 255 255 / 0.9);
+  }
+
+  a:hover {
+    color: #fff;
+  }
+
+  .bas {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-block: var(--e-3);
+    border-top: 1px solid rgb(255 255 255 / 0.15);
+    font-size: var(--taille-xs);
+  }
+
+  @media (max-width: 960px) {
+    .grille {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .grille {
+      grid-template-columns: 1fr;
+      gap: var(--e-4);
+    }
+  }
+</style>

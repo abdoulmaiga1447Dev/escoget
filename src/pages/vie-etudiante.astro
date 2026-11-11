@@ -1,0 +1,316 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import EntetePage from '../components/EntetePage.astro';
+import ImageSlot from '../components/ImageSlot.astro';
+import { etablissement as e } from '../data/etablissement';
+
+const v = e.vieEtudiante;
+---
+
+<BaseLayout
+  titre="Vie étudiante"
+  description="La vie étudiante à l’Université ESCOGET : bureau des étudiants ESCOFEDERATION, associations, événements, services et accompagnement vers l’emploi."
+>
+  <EntetePage
+    titre="Une vie de campus qui prépare à la vie professionnelle"
+    surtitre="Vie étudiante"
+    intro={`Associations, compétitions, journées de l’excellence : avec le bureau des étudiants ${v.bureau}, chacun trouve sa place et développe son esprit d’équipe.`}
+    ariane={[{ libelle: 'Vie étudiante' }]}
+    image={{ id: 'VIE-01', sujet: 'Groupe d’étudiants en discussion animée dans la cour ou un espace commun du campus' }}
+  />
+
+  <!-- Associations -->
+  <section class="section">
+    <div class="conteneur">
+      <div class="entete-section" data-revele>
+        <h2>S’engager dans une association</h2>
+        <p>Animées par les étudiants et réunies au sein de l’{v.bureau}, les associations ESCO couvrent tous les centres d’intérêt.</p>
+      </div>
+      <ul class="associations">
+        {
+          v.associations.map((a) => (
+            <li data-revele>
+              <span class="sigle" aria-hidden="true">{a.nom.replace(/^L’/, '').replace('ESCO-', '').replace('ESCO’', '').slice(0, 3)}</span>
+              <strong>{a.nom}</strong>
+              <span>{a.texte}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- Événements -->
+  <section class="section section-bleue sur-fonce">
+    <div class="conteneur evenements">
+      <div class="evenements-texte">
+        <div class="entete-section" data-revele>
+          <h2>Les événements de l’année</h2>
+        </div>
+        <ol class="liste-evenements">
+          {
+            v.evenements.map((ev) => (
+              <li data-revele>
+                <h3>{ev.nom}</h3>
+                <p>{ev.texte}</p>
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+      <div class="galerie">
+        <div class="arche cadre-image haute" data-revele="zoom">
+          <ImageSlot id="VIE-02" format="portrait" sujet="Remise de prix ou de diplômes : étudiant recevant une distinction sur scène" />
+        </div>
+        <div class="arche cadre-image" data-revele="zoom">
+          <ImageSlot id="VIE-03" format="carre" sujet="Équipe d’étudiants concentrée sur une compétition de gestion, autour d’un ordinateur" />
+        </div>
+        <div class="arche cadre-image" data-revele="zoom">
+          <ImageSlot id="VIE-04" format="carre" sujet="Tournoi de football entre étudiants, action de jeu" />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Accompagnement -->
+  <section class="section">
+    <div class="conteneur">
+      <div class="entete-section" data-revele>
+        <h2>Accompagnés jusqu’à l’emploi</h2>
+      </div>
+      <div class="cartes">
+        {
+          v.accompagnement.map((a) => (
+            <article data-revele>
+              <h3>{a.nom}</h3>
+              <p>{a.texte}</p>
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Services -->
+  <section class="section section-douce">
+    <div class="conteneur services">
+      <div class="arche cadre-image" data-revele="gauche">
+        <ImageSlot id="VIE-05" format="paysage" sujet="Bibliothèque ou salle informatique avec des étudiants au travail" />
+      </div>
+      <div data-revele="droite">
+        <div class="entete-section">
+          <h2>Des services au quotidien</h2>
+        </div>
+        <ul class="liste-services">
+          {v.services.map((s) => <li><strong>{s.nom}</strong><span>{s.texte}</span></li>)}
+        </ul>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .associations {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--e-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .associations li {
+    display: grid;
+    align-content: start;
+    gap: 0.35rem;
+    padding: var(--e-3);
+    border: 1px solid var(--filet);
+    border-radius: var(--rayon);
+    transition:
+      border-color 0.3s,
+      translate 0.2s ease,
+      box-shadow 0.3s;
+  }
+
+  .associations li:hover {
+    border-color: var(--bleu);
+    translate: 0 -2px;
+    box-shadow: 0 16px 30px -22px rgb(9 20 59 / 0.5);
+  }
+
+  .sigle {
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    margin-bottom: var(--e-1);
+    border-radius: 50%;
+    background: var(--bleu-clair);
+    color: var(--bleu);
+    font-weight: 750;
+    font-size: var(--taille-xs);
+    letter-spacing: 0.04em;
+    transition:
+      background-color 0.3s,
+      color 0.3s;
+  }
+
+  .associations li:hover .sigle {
+    background: var(--rouge);
+    color: #fff;
+  }
+
+  .associations strong {
+    color: var(--bleu);
+  }
+
+  .associations span:last-child {
+    font-size: var(--taille-s);
+    color: var(--encre-douce);
+  }
+
+  .section-bleue {
+    background: var(--bleu);
+    color: rgb(255 255 255 / 0.85);
+  }
+
+  .section-bleue h2,
+  .section-bleue h3 {
+    color: #fff;
+  }
+
+  .surtitre-clair {
+    color: #ff8a8a;
+  }
+
+  .evenements {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--e-6);
+    align-items: center;
+  }
+
+  .liste-evenements {
+    display: grid;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .liste-evenements li {
+    padding: var(--e-3) 0;
+    border-bottom: 1px solid rgb(255 255 255 / 0.15);
+  }
+
+  .liste-evenements h3 {
+    margin-bottom: 0.3rem;
+  }
+
+  .galerie {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--e-2);
+  }
+
+  .galerie .haute {
+    grid-row: span 2;
+  }
+
+  .galerie :global(.emplacement) {
+    background: rgb(255 255 255 / 0.92);
+  }
+
+  .cadre-image {
+    overflow: hidden;
+    border-radius: var(--rayon);
+  }
+
+  .cadre-image :global(.image),
+  .cadre-image :global(.emplacement) {
+    height: 100%;
+    border-radius: 0;
+    transition: transform 0.4s ease;
+  }
+
+  .cadre-image:hover :global(.image) {
+    transform: scale(1.03);
+  }
+
+  .cartes {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--e-3);
+  }
+
+  .cartes article {
+    display: grid;
+    align-content: start;
+    gap: var(--e-1);
+    padding-top: var(--e-3);
+    border-top: 3px solid var(--bleu);
+  }
+
+  .num {
+    font-size: var(--taille-xl);
+    font-weight: 750;
+    color: var(--rouge);
+  }
+
+  .cartes p {
+    color: var(--encre-douce);
+    font-size: var(--taille-s);
+  }
+
+  .services {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--e-6);
+    align-items: center;
+  }
+
+  .services .entete-section {
+    margin-bottom: var(--e-3);
+  }
+
+  .liste-services {
+    display: grid;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .liste-services li {
+    display: grid;
+    padding: var(--e-2) 0;
+    border-bottom: 1px solid var(--filet);
+  }
+
+  .liste-services strong {
+    color: var(--bleu);
+  }
+
+  .liste-services span {
+    color: var(--encre-douce);
+    font-size: var(--taille-s);
+  }
+
+  @media (max-width: 1000px) {
+    .associations,
+    .cartes {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .evenements,
+    .services {
+      grid-template-columns: 1fr;
+      gap: var(--e-4);
+    }
+  }
+
+  @media (max-width: 560px) {
+    .associations,
+    .cartes {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

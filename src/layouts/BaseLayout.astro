@@ -1,0 +1,52 @@
+---
+import '@fontsource-variable/archivo/wdth.css';
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+interface Props {
+  titre: string;
+  description?: string;
+}
+
+const {
+  titre,
+  description = 'Université ESCOGET, établissement privé d’enseignement supérieur à Abidjan depuis 1986 : BTS, Licences et Masters professionnels en gestion, commerce, droit et technologies.',
+} = Astro.props;
+const titreComplet = titre === 'Accueil' ? 'Université ESCOGET · Abidjan' : `${titre} · Université ESCOGET`;
+---
+
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{titreComplet}</title>
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="theme-color" content="#09143b" />
+    <script is:inline>
+      // Animations complètes (« anim ») ou réduites à de simples fondus (« anim-reduit »)
+      // si l'utilisateur a demandé moins d'animations dans son système.
+      // Filet de sécurité : si le script d'animation ne démarre pas, tout est réaffiché.
+      (function () {
+        var mode = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'anim-reduit' : 'anim';
+        document.documentElement.classList.add(mode);
+        setTimeout(function () {
+          if (!window.__animOk) document.documentElement.classList.remove(mode);
+        }, 2500);
+      })();
+    </script>
+  </head>
+  <body>
+    <a class="lien-evitement" href="#contenu">Aller au contenu</a>
+    <Header />
+    <main id="contenu">
+      <slot />
+    </main>
+    <Footer />
+    <script>
+      import '../scripts/animations.ts';
+    </script>
+  </body>
+</html>

@@ -1,0 +1,233 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import EntetePage from '../components/EntetePage.astro';
+import ImageSlot from '../components/ImageSlot.astro';
+import { etablissement as e } from '../data/etablissement';
+import { formations } from '../data/formations';
+
+const itineraire = (requete: string) => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(requete)}`;
+---
+
+<BaseLayout titre="Contact" description="Contacter l’Université ESCOGET : adresse du campus de la Riviera Palmeraie, téléphones, email et formulaire de contact.">
+  <EntetePage
+    titre="Nous contacter"
+    surtitre="Contact"
+    intro="Une question sur une formation, une inscription ou un partenariat ? Écrivez-nous, appelez-nous ou venez nous rencontrer sur le campus."
+    ariane={[{ libelle: 'Contact' }]}
+  />
+
+  <section class="section">
+    <div class="conteneur zone">
+      <div class="coordonnees">
+        <div class="bloc" data-revele>
+          <h2>Par téléphone</h2>
+          {e.telephones.map((t) => <a class="grand-lien" href={`tel:${t.replace(/\s/g, '')}`}>{t}</a>)}
+        </div>
+        <div class="bloc" data-revele>
+          <h2>Par email</h2>
+          <a class="grand-lien" href={`mailto:${e.email}`}>{e.email}</a>
+        </div>
+        <div class="bloc" data-revele>
+          <h2>Par courrier</h2>
+          <p>{e.nom}<br />{e.boitePostale}</p>
+        </div>
+      </div>
+
+      <form class="formulaire carte-formulaire" data-formulaire data-revele="droite">
+        <h2>Écrivez-nous</h2>
+        <div class="champs">
+          <div class="champ">
+            <label for="c-nom">Nom et prénoms <span class="obligatoire" aria-hidden="true">*</span></label>
+            <input id="c-nom" name="nom" autocomplete="name" required />
+          </div>
+          <div class="champ">
+            <label for="c-tel">Téléphone</label>
+            <input id="c-tel" name="telephone" type="tel" autocomplete="tel" />
+          </div>
+          <div class="champ champ-large">
+            <label for="c-email">Adresse email <span class="obligatoire" aria-hidden="true">*</span></label>
+            <input id="c-email" name="email" type="email" autocomplete="email" required />
+          </div>
+          <div class="champ">
+            <label for="c-objet">Objet <span class="obligatoire" aria-hidden="true">*</span></label>
+            <select id="c-objet" name="objet" required>
+              <option value="">Choisir…</option>
+              <option value="information">Demande d’information</option>
+              <option value="programme">Recevoir le programme d’une formation</option>
+              <option value="inscription">Inscription</option>
+              <option value="formation-continue">Formation continue (entreprises)</option>
+              <option value="partenariat">Partenariat, stage, recrutement</option>
+              <option value="autre">Autre</option>
+            </select>
+          </div>
+          <div class="champ">
+            <label for="c-formation">Formation concernée</label>
+            <select id="c-formation" name="formation">
+              <option value="">Aucune en particulier</option>
+              {formations.map((f) => <option value={f.slug}>{f.niveau} · {f.intitule}</option>)}
+            </select>
+          </div>
+          <div class="champ champ-large">
+            <label for="c-message">Message <span class="obligatoire" aria-hidden="true">*</span></label>
+            <textarea id="c-message" name="message" required></textarea>
+          </div>
+        </div>
+        <button class="bouton bouton-principal" type="submit">Envoyer</button>
+        <p class="message-formulaire" data-message role="status" tabindex="-1" hidden></p>
+      </form>
+    </div>
+  </section>
+
+  <section class="section section-douce">
+    <div class="conteneur">
+      <div class="entete-section" data-revele>
+        <h2>Venir nous rencontrer</h2>
+      </div>
+      <div class="campus">
+        {
+          e.campus.map((c, i) => (
+            <article data-revele>
+              <div class="arche cadre-image">
+                <ImageSlot
+                  id={`CON-0${i + 1}`}
+                  format="paysage"
+                  sujet={c.principal ? 'Façade ou entrée du campus de la Riviera Palmeraie' : 'Façade du site du Plateau'}
+                />
+              </div>
+              <div class="campus-texte">
+                {c.principal && <span class="etiquette">Campus principal</span>}
+                <h3>{c.nom}</h3>
+                <p>{c.adresse.map((l, j) => (j ? <><br />{l}</> : l))}</p>
+                <a href={itineraire(`Université ESCOGET ${c.adresse.join(' ')}`)} target="_blank" rel="noopener">
+                  Voir l’itinéraire
+                </a>
+              </div>
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  import '../scripts/formulaires.ts';
+
+  // Pré-remplissage depuis une fiche formation (/contact?objet=programme&formation=…)
+  const params = new URLSearchParams(location.search);
+  for (const [nom, id] of [['objet', 'c-objet'], ['formation', 'c-formation']]) {
+    const valeur = params.get(nom);
+    const liste = document.getElementById(id) as HTMLSelectElement | null;
+    if (valeur && liste && [...liste.options].some((o) => o.value === valeur)) liste.value = valeur;
+  }
+</script>
+
+<style>
+  .zone {
+    display: grid;
+    grid-template-columns: 0.75fr 1.25fr;
+    gap: var(--e-6);
+    align-items: start;
+  }
+
+  .coordonnees {
+    display: grid;
+    gap: var(--e-4);
+  }
+
+  .bloc {
+    display: grid;
+    gap: 0.4rem;
+    padding-left: var(--e-3);
+    border-left: 3px solid var(--rouge);
+  }
+
+  .bloc h2 {
+    font-size: var(--taille-xs);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--encre-douce);
+  }
+
+  .grand-lien {
+    font-size: var(--taille-l);
+    font-weight: 650;
+    text-decoration: none;
+    overflow-wrap: anywhere;
+  }
+
+  .carte-formulaire {
+    padding: var(--e-4);
+    border: 1px solid var(--filet);
+    border-radius: var(--rayon);
+    box-shadow: 0 30px 60px -40px rgb(9 20 59 / 0.45);
+  }
+
+  .carte-formulaire h2 {
+    font-size: var(--taille-xl);
+  }
+
+  .carte-formulaire .bouton {
+    justify-self: start;
+  }
+
+  .campus {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--e-3);
+  }
+
+  .campus article {
+    display: grid;
+    background: #fff;
+    border-radius: var(--rayon);
+    overflow: hidden;
+  }
+
+  .cadre-image {
+    overflow: hidden;
+  }
+
+  .cadre-image :global(.image),
+  .cadre-image :global(.emplacement) {
+    border-radius: 0;
+    transition: transform 0.4s ease;
+  }
+
+  .campus article:hover :global(.image) {
+    transform: scale(1.03);
+  }
+
+  .campus-texte {
+    display: grid;
+    gap: var(--e-1);
+    padding: var(--e-3);
+  }
+
+  .etiquette {
+    justify-self: start;
+    padding: 0.15rem 0.6rem;
+    border-radius: 999px;
+    background: var(--rouge-clair);
+    color: var(--rouge);
+    font-size: var(--taille-xs);
+    font-weight: 700;
+  }
+
+  .campus-texte a {
+    font-weight: 650;
+  }
+
+  @media (max-width: 900px) {
+    .zone,
+    .campus {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .carte-formulaire {
+      padding: var(--e-3);
+    }
+  }
+</style>

@@ -1,0 +1,69 @@
+---
+/** Page provisoire : annonce le contenu prévu tant que la page n'est pas construite. */
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+interface Props {
+  titre: string;
+  surtitre?: string;
+  contenu: string[];
+  semaine: string;
+}
+
+const { titre, surtitre = 'Université ESCOGET', contenu, semaine } = Astro.props;
+---
+
+<BaseLayout titre={titre}>
+  <section class="entete-page">
+    <div class="conteneur">
+      <p class="surtitre">{surtitre}</p>
+      <h1>{titre}</h1>
+    </div>
+  </section>
+  <section class="section">
+    <div class="conteneur provisoire">
+      <p class="etat">Page en construction · {semaine}</p>
+      <h2>Contenu prévu</h2>
+      <ul>
+        {contenu.map((c) => <li>{c}</li>)}
+      </ul>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .entete-page {
+    padding-block: var(--e-6) var(--e-5);
+    background: var(--fond-doux);
+    border-bottom: 1px solid var(--filet);
+  }
+
+  .entete-page h1 {
+    margin-top: var(--e-2);
+  }
+
+  .provisoire {
+    max-width: 44rem;
+  }
+
+  .etat {
+    display: inline-block;
+    margin-bottom: var(--e-3);
+    padding: 0.3rem 0.8rem;
+    border-radius: 999px;
+    background: var(--rouge-clair);
+    color: var(--rouge);
+    font-weight: 700;
+    font-size: var(--taille-xs);
+  }
+
+  h2 {
+    font-size: var(--taille-l);
+    margin-bottom: var(--e-2);
+  }
+
+  ul {
+    display: grid;
+    gap: 0.5rem;
+    padding-left: 1.2rem;
+  }
+</style>

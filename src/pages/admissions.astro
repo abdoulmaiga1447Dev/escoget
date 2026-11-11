@@ -1,0 +1,355 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import EntetePage from '../components/EntetePage.astro';
+import { formations, niveaux, type Niveau } from '../data/formations';
+import { etablissement } from '../data/etablissement';
+
+const ordre: Niveau[] = ['BTS', 'Licence', 'Master'];
+
+// Conditions d'accès : générales, tirées des dossiers d'homologation.
+// Les pièces à fournir, les dates et les frais ne sont pas encore connus (à demander à l'Université).
+const conditions: Record<Niveau, string[]> = {
+  // A_CONFIRMER : aucun document reçu ne décrit l'admission en BTS.
+  BTS: ['Être titulaire du baccalauréat ou d’un diplôme équivalent.', 'Étude du dossier de candidature.'],
+  Licence: [
+    'Être titulaire du baccalauréat (séries A, B, C, D) ou d’un diplôme équivalent.',
+    'Étude du dossier, test d’entrée écrit et entretien avec un jury.',
+  ],
+  Master: [
+    'Être titulaire d’une Licence (Bac + 3) dans le domaine visé ou d’un diplôme équivalent ; une expérience professionnelle dans le domaine est aussi prise en compte.',
+    'Étude du dossier (relevés de notes, diplômes), puis entretien avec le responsable de la filière ; test d’entrée pour certaines spécialités.',
+  ],
+};
+
+const etapes = [
+  { titre: 'Choisissez votre formation', texte: 'Parcourez le catalogue et repérez la formation qui correspond à votre projet.' },
+  { titre: 'Faites votre demande en ligne', texte: 'Remplissez le formulaire ci-dessous : il ne prend que quelques minutes.' },
+  { titre: 'Échangez avec la scolarité', texte: 'Le service de scolarité vous recontacte, vous indique les pièces à fournir et les modalités de sélection.' },
+  { titre: 'Finalisez votre inscription', texte: 'Après validation de votre dossier, vous recevez la confirmation de votre inscription.' },
+];
+---
+
+<BaseLayout
+  titre="Admissions"
+  description="Rejoindre l’Université ESCOGET : conditions d’accès au BTS, à la Licence et au Master, étapes de l’inscription et demande d’admission en ligne."
+>
+  <EntetePage
+    titre="Rejoindre l’Université ESCOGET"
+    surtitre="Admissions"
+    intro="Du baccalauréat au Master, voici comment intégrer nos formations. Déposez votre demande en ligne : notre service de scolarité vous accompagne ensuite à chaque étape."
+    ariane={[{ libelle: 'Admissions' }]}
+    image={{ id: 'ADM-01', sujet: 'Étudiant ou étudiante accueilli(e) au bureau de la scolarité, échange souriant' }}
+  >
+    <div class="actions entree" style="--delai:0.18s">
+      <a class="bouton bouton-principal" href="#preinscription">Faire ma demande</a>
+    </div>
+  </EntetePage>
+
+  <!-- Étapes -->
+  <section class="section">
+    <div class="conteneur">
+      <div class="entete-section" data-revele>
+        <h2>Quatre étapes pour nous rejoindre</h2>
+      </div>
+      <ol class="etapes">
+        {
+          etapes.map((e, i) => (
+            <li data-revele>
+              <span class="num" aria-hidden="true">{i + 1}</span>
+              <h3>{e.titre}</h3>
+              <p>{e.texte}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <!-- Conditions par niveau -->
+  <section class="section section-douce">
+    <div class="conteneur">
+      <div class="entete-section" data-revele>
+        <h2>Quel niveau pour quelle formation ?</h2>
+      </div>
+      <div class="niveaux">
+        {
+          ordre.map((n) => (
+            <article data-revele>
+              <p class="niveau-duree">{niveaux[n].duree}</p>
+              <h3>{niveaux[n].libelle}</h3>
+              <ul>{conditions[n].map((c) => <li>{c}</li>)}</ul>
+              <a href={`/formations?niveau=${n}`}>
+                Les formations en {n === 'BTS' ? 'BTS' : n}
+              </a>
+            </article>
+          ))
+        }
+      </div>
+      <p class="precision" data-revele>
+        Les pièces à fournir, le calendrier de la rentrée et les frais de scolarité vous sont communiqués par le service de
+        scolarité lors de votre demande.
+      </p>
+    </div>
+  </section>
+
+  <!-- Formulaire -->
+  <section class="section" id="preinscription">
+    <div class="conteneur formulaire-zone">
+      <div class="formulaire-intro" data-revele="gauche">
+        <h2>Faites votre demande en ligne</h2>
+        <p>Remplissez ce formulaire : notre service de scolarité vous recontacte pour la suite de votre inscription.</p>
+        <div class="contact-direct">
+          <p><strong>Une question ?</strong> Appelez-nous :</p>
+          {etablissement.telephones.map((t) => <a href={`tel:${t.replace(/\s/g, '')}`}>{t}</a>)}
+        </div>
+      </div>
+
+      <form class="formulaire carte-formulaire" data-formulaire novalidate={false} data-revele="droite">
+        <div class="champs">
+          <div class="champ">
+            <label for="nom">Nom <span class="obligatoire" aria-hidden="true">*</span></label>
+            <input id="nom" name="nom" autocomplete="family-name" required />
+          </div>
+          <div class="champ">
+            <label for="prenoms">Prénoms <span class="obligatoire" aria-hidden="true">*</span></label>
+            <input id="prenoms" name="prenoms" autocomplete="given-name" required />
+          </div>
+          <div class="champ">
+            <label for="telephone">Téléphone <span class="obligatoire" aria-hidden="true">*</span></label>
+            <input id="telephone" name="telephone" type="tel" autocomplete="tel" placeholder="+225 07 00 00 00 00" required />
+          </div>
+          <div class="champ">
+            <label for="email">Adresse email</label>
+            <input id="email" name="email" type="email" autocomplete="email" />
+          </div>
+          <div class="champ">
+            <label for="naissance">Date de naissance <span class="obligatoire" aria-hidden="true">*</span></label>
+            <input id="naissance" name="naissance" type="date" autocomplete="bday" required />
+          </div>
+          <div class="champ">
+            <label for="diplome">Dernier diplôme obtenu <span class="obligatoire" aria-hidden="true">*</span></label>
+            <select id="diplome" name="diplome" required>
+              <option value="">Choisir…</option>
+              <option>Baccalauréat</option>
+              <option>BTS</option>
+              <option>Licence</option>
+              <option>Master</option>
+              <option>Autre</option>
+            </select>
+          </div>
+          <div class="champ champ-large">
+            <label for="formation">Formation souhaitée <span class="obligatoire" aria-hidden="true">*</span></label>
+            <select id="formation" name="formation" required>
+              <option value="">Choisir une formation…</option>
+              {
+                ordre.map((n) => (
+                  <optgroup label={niveaux[n].libelle}>
+                    {formations
+                      .filter((f) => f.niveau === n)
+                      .map((f) => (
+                        <option value={f.slug}>{f.intitule}</option>
+                      ))}
+                  </optgroup>
+                ))
+              }
+            </select>
+          </div>
+          <div class="champ champ-large">
+            <label for="message">Message</label>
+            <textarea id="message" name="message" placeholder="Précisez votre projet ou vos questions (facultatif)"></textarea>
+          </div>
+        </div>
+        <p class="aide">Les champs marqués d’un <span class="obligatoire">*</span> sont obligatoires. Vos informations servent uniquement à traiter votre demande.</p>
+        <button class="bouton bouton-principal" type="submit">Envoyer ma demande</button>
+        <p class="message-formulaire" data-message role="status" tabindex="-1" hidden></p>
+      </form>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  import '../scripts/formulaires.ts';
+
+  // Formation présélectionnée depuis une fiche (/admissions?formation=…)
+  const choisie = new URLSearchParams(location.search).get('formation');
+  const liste = document.querySelector<HTMLSelectElement>('#formation');
+  if (choisie && liste && [...liste.options].some((o) => o.value === choisie)) liste.value = choisie;
+</script>
+
+<style>
+  .actions {
+    margin-top: var(--e-4);
+  }
+
+  .etapes {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--e-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: etape;
+  }
+
+  .etapes li {
+    position: relative;
+    display: grid;
+    align-content: start;
+    gap: var(--e-1);
+    padding-top: var(--e-4);
+  }
+
+  .etapes li::before {
+    content: '';
+    position: absolute;
+    top: 1.35rem;
+    left: 3.2rem;
+    right: calc(var(--e-3) * -1);
+    height: 2px;
+    background: repeating-linear-gradient(90deg, var(--filet) 0 8px, transparent 8px 14px);
+  }
+
+  .etapes li:last-child::before {
+    display: none;
+  }
+
+  .num {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: grid;
+    place-items: center;
+    width: 2.7rem;
+    height: 2.7rem;
+    border-radius: 50%;
+    background: var(--rouge);
+    color: #fff;
+    font-weight: 750;
+    font-size: var(--taille-l);
+  }
+
+  .etapes h3 {
+    margin-top: var(--e-3);
+  }
+
+  .etapes p {
+    color: var(--encre-douce);
+    font-size: var(--taille-s);
+  }
+
+  .niveaux {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--e-3);
+  }
+
+  .niveaux article {
+    display: grid;
+    align-content: start;
+    gap: var(--e-2);
+    padding: var(--e-4);
+    background: #fff;
+    border-radius: var(--rayon);
+    border-top: 4px solid var(--bleu);
+  }
+
+  .niveau-duree {
+    color: var(--rouge);
+    font-weight: 650;
+    font-size: var(--taille-s);
+  }
+
+  .niveaux ul {
+    display: grid;
+    gap: 0.5rem;
+    margin: 0;
+    padding-left: 1.1rem;
+    color: var(--encre-douce);
+  }
+
+  .niveaux a {
+    font-weight: 650;
+  }
+
+  .precision {
+    margin-top: var(--e-4);
+    color: var(--encre-douce);
+    max-width: 48rem;
+  }
+
+  .formulaire-zone {
+    display: grid;
+    grid-template-columns: 0.8fr 1.2fr;
+    gap: var(--e-6);
+    align-items: start;
+  }
+
+  .formulaire-intro {
+    display: grid;
+    gap: var(--e-3);
+    position: sticky;
+    top: 7rem;
+  }
+
+  .formulaire-intro > p:not(.surtitre) {
+    color: var(--encre-douce);
+  }
+
+  .contact-direct {
+    display: grid;
+    gap: 0.3rem;
+    padding: var(--e-3);
+    background: var(--fond-doux);
+    border-radius: var(--rayon);
+  }
+
+  .contact-direct a {
+    font-weight: 650;
+    font-size: var(--taille-l);
+  }
+
+  .carte-formulaire {
+    padding: var(--e-4);
+    border: 1px solid var(--filet);
+    border-radius: var(--rayon);
+    box-shadow: 0 30px 60px -40px rgb(9 20 59 / 0.45);
+  }
+
+  .carte-formulaire .bouton {
+    justify-self: start;
+  }
+
+  .aide {
+    font-size: var(--taille-xs);
+    color: var(--encre-douce);
+  }
+
+  @media (max-width: 1000px) {
+    .etapes {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .etapes li::before {
+      display: none;
+    }
+
+    .niveaux,
+    .formulaire-zone {
+      grid-template-columns: 1fr;
+    }
+
+    .formulaire-intro {
+      position: static;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .etapes {
+      grid-template-columns: 1fr;
+    }
+
+    .carte-formulaire {
+      padding: var(--e-3);
+    }
+  }
+</style>

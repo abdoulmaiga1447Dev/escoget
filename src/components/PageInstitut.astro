@@ -1,0 +1,173 @@
+---
+/** Page d'un institut qui délivre des diplômes (IHECG, IHET) : présentation et formations rattachées. */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import EntetePage from './EntetePage.astro';
+import CarteFormation from './CarteFormation.astro';
+import { etablissement } from '../data/etablissement';
+import { formations, niveaux, type Niveau } from '../data/formations';
+
+interface Props {
+  sigle: 'IHECG' | 'IHET';
+  image: { id: string; sujet: string };
+}
+
+const { sigle, image } = Astro.props;
+const inst = etablissement.instituts.find((i) => i.sigle === sigle)!;
+const liste = formations.filter((f) => f.institut === sigle);
+const ordre: Niveau[] = ['BTS', 'Licence', 'Master'];
+---
+
+<BaseLayout titre={`${inst.sigle} · ${inst.nom}`} description={`${inst.nom} (${inst.sigle}), institut de l’Université ESCOGET : ${inst.texte}`}>
+  <EntetePage
+    titre={inst.nom}
+    surtitre={`${inst.sigle} · depuis ${inst.depuis}`}
+    intro={inst.texte}
+    ariane={[{ libelle: 'Instituts', lien: '/instituts' }, { libelle: inst.sigle }]}
+    image={image}
+  />
+
+  <section class="section">
+    <div class="conteneur presentation">
+      <ul class="points">
+        {
+          inst.pointsForts.map((p) => (
+            <li data-revele>
+              {p}
+            </li>
+          ))
+        }
+      </ul>
+      <aside class="responsable" data-revele="droite">
+        <p class="surtitre">Direction pédagogique</p>
+        <p><strong>{inst.responsable.nom}</strong>{inst.responsable.fonction} de l’{inst.sigle}</p>
+        <a class="bouton bouton-secondaire" href="/contact">Contacter l’institut</a>
+      </aside>
+    </div>
+  </section>
+
+  <section class="section section-douce">
+    <div class="conteneur">
+      <div class="entete-section" data-revele>
+        <h2>{liste.length} formations à l’{inst.sigle}</h2>
+      </div>
+      {
+        ordre.map((n) => {
+          const duNiveau = liste.filter((f) => f.niveau === n);
+          return duNiveau.length ? (
+            <div class="groupe">
+              <h3 class="groupe-titre">
+                {niveaux[n].libelle} <span>{niveaux[n].duree}</span>
+              </h3>
+              <ul class="grille">
+                {duNiveau.map((f) => (
+                  <li data-revele>
+                    <CarteFormation formation={f} />
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null;
+        })
+      }
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .presentation {
+    display: grid;
+    grid-template-columns: 1.4fr 0.6fr;
+    gap: var(--e-6);
+    align-items: start;
+  }
+
+  .points {
+    display: grid;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .points li {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: var(--e-3);
+    padding: var(--e-3) 0;
+    border-bottom: 1px solid var(--filet);
+    font-size: var(--taille-l);
+    font-weight: 600;
+    color: var(--bleu);
+  }
+
+  .num {
+    color: var(--rouge);
+    font-weight: 750;
+  }
+
+  .responsable {
+    display: grid;
+    gap: var(--e-2);
+    justify-items: start;
+    padding: var(--e-4);
+    border-radius: var(--rayon);
+    background: var(--fond-doux);
+    border-top: 4px solid var(--rouge);
+  }
+
+  .responsable p:not(.surtitre) {
+    display: grid;
+    color: var(--encre-douce);
+  }
+
+  .responsable strong {
+    color: var(--bleu);
+    font-size: var(--taille-l);
+  }
+
+  .groupe + .groupe {
+    margin-top: var(--e-5);
+  }
+
+  .groupe-titre {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.4rem 1rem;
+    padding-bottom: var(--e-2);
+    margin-bottom: var(--e-3);
+    border-bottom: 2px solid var(--bleu);
+    font-size: var(--taille-xl);
+  }
+
+  .groupe-titre span {
+    font-size: var(--taille-s);
+    font-weight: 500;
+    color: var(--encre-douce);
+  }
+
+  .grille {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--e-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (max-width: 960px) {
+    .presentation {
+      grid-template-columns: 1fr;
+      gap: var(--e-4);
+    }
+
+    .grille {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 600px) {
+    .grille {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

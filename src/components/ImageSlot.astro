@@ -1,0 +1,101 @@
+---
+/**
+ * Emplacement d'image.
+ * - Si un fichier nommé d'après le code (ex. ACC-01.jpg) se trouve dans
+ *   public/images/provisoires/, il est affiché automatiquement.
+ * - Sinon, avec `src`, affiche cette image.
+ * - Sinon, affiche un cadre qui décrit la photo attendue : c'est la commande d'image.
+ * Les textes alternatifs des photos placées sont dans src/data/images.ts.
+ */
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
+import { textesAlternatifs } from '../data/images';
+interface Props {
+  id: string;            // code de l'image (ex. ACC-01), qui est aussi le nom du fichier à déposer
+  sujet: string;         // ce que la photo doit montrer
+  format?: 'paysage' | 'portrait' | 'carre' | 'large';
+  src?: string;
+  alt?: string;
+  class?: string;
+}
+
+const { id, sujet, format = 'paysage', class: classe = '' } = Astro.props;
+
+// Recherche d'une image déposée sous son code, quelle que soit l'extension.
+// Chemin depuis la racine du projet (dossier où l'on lance npm run dev / build).
+const dossier = join(process.cwd(), 'public', 'images', 'provisoires');
+const extensions = ['jpg', 'jpeg', 'png', 'webp', 'JPG', 'JPEG', 'PNG', 'WEBP'];
+const trouvee = extensions.find((ext) => existsSync(join(dossier, `${id}.${ext}`)));
+const src = trouvee ? `/images/provisoires/${id}.${trouvee}` : Astro.props.src;
+// Texte alternatif : celui passé au composant, sinon la description réelle de la photo, sinon le sujet demandé.
+const alt = Astro.props.alt ?? (trouvee ? (textesAlternatifs[id] ?? sujet) : '');
+
+const ratios = {
+  large: { ratio: '21 / 9', taille: '2400 × 1030 px' },
+  paysage: { ratio: '3 / 2', taille: '1800 × 1200 px' },
+  portrait: { ratio: '4 / 5', taille: '1200 × 1500 px' },
+  carre: { ratio: '1 / 1', taille: '1200 × 1200 px' },
+};
+const { ratio, taille } = ratios[format];
+---
+
+{
+  src ? (
+    <img class:list={['image', classe]} src={src} alt={alt} style={`aspect-ratio:${ratio}`} loading="lazy" />
+  ) : (
+    <div class:list={['emplacement', classe]} style={`aspect-ratio:${ratio}`} role="img" aria-label={`Image à venir : ${sujet}`}>
+      <span class="code">{id}</span>
+      <span class="sujet">{sujet}</span>
+      <span class="taille">{format} · min. {taille}</span>
+    </div>
+  )
+}
+
+<style>
+  .image {
+    width: 100%;
+    object-fit: cover;
+    border-radius: var(--rayon);
+  }
+
+  .emplacement {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 0.35rem;
+    width: 100%;
+    padding: 1.25rem;
+    border-radius: var(--rayon);
+    overflow: hidden;
+    color: var(--bleu);
+    background:
+      repeating-linear-gradient(135deg, transparent 0 14px, rgb(9 20 59 / 0.05) 14px 15px),
+      var(--bleu-clair);
+    border: 1px dashed rgb(9 20 59 / 0.3);
+  }
+
+  .code {
+    position: absolute;
+    top: 1rem;
+    left: 1.25rem;
+    font-size: var(--taille-xs);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    padding: 0.15rem 0.5rem;
+    border-radius: 999px;
+    background: var(--bleu);
+    color: #fff;
+  }
+
+  .sujet {
+    font-weight: 650;
+    line-height: 1.35;
+    max-width: 30rem;
+  }
+
+  .taille {
+    font-size: var(--taille-xs);
+    color: var(--encre-douce);
+  }
+</style>

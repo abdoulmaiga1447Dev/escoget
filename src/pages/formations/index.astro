@@ -1,0 +1,289 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import EntetePage from '../../components/EntetePage.astro';
+import CarteFormation from '../../components/CarteFormation.astro';
+import { formations, niveaux, domaines, type Niveau, type Domaine } from '../../data/formations';
+
+const ordreNiveaux: Niveau[] = ['BTS', 'Licence', 'Master'];
+const listeDomaines = Object.entries(domaines) as [Domaine, { libelle: string }][];
+---
+
+<BaseLayout
+  titre="Nos formations"
+  description="Catalogue des formations de l’Université ESCOGET : BTS, Licences professionnelles et Masters professionnels en gestion, droit et technologies."
+>
+  <EntetePage
+    titre="Nos formations"
+    surtitre="Du BTS au Master"
+    intro={`${formations.length} formations professionnelles en économie et gestion, en droit et en sciences et technologies. Filtrez par niveau, par domaine ou par institut.`}
+    ariane={[{ libelle: 'Formations' }]}
+  />
+
+  <section class="section catalogue">
+    <div class="conteneur">
+      <form class="filtres" role="search" aria-label="Filtrer les formations" data-revele>
+        <fieldset class="filtre-niveaux">
+          <legend>Niveau</legend>
+          <div class="pastilles">
+            <label><input type="radio" name="niveau" value="" checked /> <span>Tous</span></label>
+            {ordreNiveaux.map((n) => <label><input type="radio" name="niveau" value={n} /> <span>{niveaux[n].libelle}</span></label>)}
+          </div>
+        </fieldset>
+        <div class="champ">
+          <label for="filtre-domaine">Domaine</label>
+          <select id="filtre-domaine" name="domaine">
+            <option value="">Tous les domaines</option>
+            {listeDomaines.map(([cle, d]) => <option value={cle}>{d.libelle}</option>)}
+          </select>
+        </div>
+        <div class="champ">
+          <label for="filtre-institut">Institut</label>
+          <select id="filtre-institut" name="institut">
+            <option value="">Tous les instituts</option>
+            <option value="IHECG">IHECG · Commerce et gestion</option>
+            <option value="IHET">IHET · Technologies</option>
+          </select>
+        </div>
+        <div class="champ">
+          <label for="filtre-recherche">Rechercher</label>
+          <input id="filtre-recherche" name="recherche" type="search" placeholder="Ex. : marketing, génie civil…" autocomplete="off" />
+        </div>
+      </form>
+
+      <p class="resultat" aria-live="polite"><strong id="nb-resultats">{formations.length}</strong> formations</p>
+
+      {
+        ordreNiveaux.map((n) => (
+          <div class="groupe" data-groupe={n}>
+            <h2 class="groupe-titre">
+              {niveaux[n].libelle} <span>{niveaux[n].duree} · {niveaux[n].acces}</span>
+            </h2>
+            <ul class="grille">
+              {formations
+                .filter((f) => f.niveau === n)
+                .map((f) => (
+                  <li data-revele>
+                    <CarteFormation formation={f} />
+                  </li>
+                ))}
+            </ul>
+          </div>
+        ))
+      }
+
+      <div class="vide" hidden>
+        <h2>Aucune formation ne correspond</h2>
+        <p>Essayez un autre mot-clé ou retirez un filtre.</p>
+        <button type="button" class="bouton bouton-secondaire" data-reinitialiser>Afficher toutes les formations</button>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  const formulaire = document.querySelector<HTMLFormElement>('.filtres')!;
+  const cartes = [...document.querySelectorAll<HTMLElement>('.grille > li')];
+  const groupes = [...document.querySelectorAll<HTMLElement>('[data-groupe]')];
+  const compteur = document.getElementById('nb-resultats')!;
+  const vide = document.querySelector<HTMLElement>('.vide')!;
+
+  // Niveau reçu depuis l'accueil (/formations?niveau=Licence)
+  const parametre = new URLSearchParams(location.search).get('niveau');
+  if (parametre) {
+    const radio = formulaire.querySelector<HTMLInputElement>(`input[name="niveau"][value="${CSS.escape(parametre)}"]`);
+    if (radio) radio.checked = true;
+  }
+
+  const sansAccents = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+
+  function filtrer() {
+    const donnees = new FormData(formulaire);
+    const niveau = String(donnees.get('niveau') ?? '');
+    const domaine = String(donnees.get('domaine') ?? '');
+    const institut = String(donnees.get('institut') ?? '');
+    const recherche = sansAccents(String(donnees.get('recherche') ?? '').trim());
+
+    let total = 0;
+    for (const li of cartes) {
+      const c = li.querySelector<HTMLElement>('.carte')!.dataset;
+      const ok =
+        (!niveau || c.niveau === niveau) &&
+        (!domaine || c.domaine === domaine) &&
+        (!institut || c.institut === institut) &&
+        (!recherche || sansAccents(c.recherche ?? '').includes(recherche));
+      li.hidden = !ok;
+      if (ok) {
+        total++;
+        li.classList.add('visible');
+      }
+    }
+    for (const g of groupes) g.hidden = !g.querySelector('.grille > li:not([hidden])');
+    compteur.textContent = String(total);
+    vide.hidden = total > 0;
+
+    const url = new URL(location.href);
+    if (niveau) url.searchParams.set('niveau', niveau);
+    else url.searchParams.delete('niveau');
+    history.replaceState(null, '', url);
+  }
+
+  formulaire.addEventListener('input', filtrer);
+  formulaire.addEventListener('submit', (e) => e.preventDefault());
+  document.querySelector('[data-reinitialiser]')?.addEventListener('click', () => {
+    formulaire.reset();
+    filtrer();
+  });
+  filtrer();
+</script>
+
+<style>
+  .catalogue {
+    padding-top: var(--e-5);
+  }
+
+  .filtres {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr 1fr 1.2fr;
+    gap: var(--e-3);
+    align-items: end;
+    padding: var(--e-3);
+    margin-top: calc(var(--e-6) * -1 - var(--e-5) + var(--e-3));
+    position: relative;
+    background: #fff;
+    border: 1px solid var(--filet);
+    border-radius: var(--rayon);
+    box-shadow: 0 24px 48px -32px rgb(9 20 59 / 0.45);
+  }
+
+  fieldset {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    min-width: 0;
+  }
+
+  legend {
+    margin-bottom: 0.4rem;
+    font-weight: 650;
+    font-size: var(--taille-s);
+    color: var(--bleu);
+  }
+
+  .pastilles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .pastilles label {
+    position: relative;
+  }
+
+  .pastilles input {
+    position: absolute;
+    opacity: 0;
+    inset: 0;
+    cursor: pointer;
+  }
+
+  .pastilles span {
+    display: inline-flex;
+    align-items: center;
+    min-height: 3rem;
+    padding: 0.5rem 0.95rem;
+    border: 1px solid #b8c0cf;
+    border-radius: 999px;
+    font-size: var(--taille-s);
+    font-weight: 600;
+    color: var(--bleu);
+    transition:
+      background-color 0.2s,
+      color 0.2s,
+      border-color 0.2s;
+  }
+
+  .pastilles input:checked + span {
+    background: var(--bleu);
+    border-color: var(--bleu);
+    color: #fff;
+  }
+
+  .pastilles input:focus-visible + span {
+    outline: 3px solid var(--rouge);
+    outline-offset: 2px;
+  }
+
+  .resultat {
+    margin-block: var(--e-4) var(--e-3);
+    color: var(--encre-douce);
+  }
+
+  .resultat strong {
+    color: var(--bleu);
+  }
+
+  .groupe + .groupe {
+    margin-top: var(--e-5);
+  }
+
+  .groupe-titre {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.4rem 1rem;
+    padding-bottom: var(--e-2);
+    margin-bottom: var(--e-3);
+    border-bottom: 2px solid var(--bleu);
+    font-size: var(--taille-xl);
+  }
+
+  .groupe-titre span {
+    font-size: var(--taille-s);
+    font-weight: 500;
+    color: var(--encre-douce);
+  }
+
+  .grille {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--e-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .vide {
+    display: grid;
+    justify-items: start;
+    gap: var(--e-2);
+    padding: var(--e-5) 0;
+  }
+
+  .vide[hidden] {
+    display: none;
+  }
+
+  @media (max-width: 1000px) {
+    .filtres {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .filtre-niveaux {
+      grid-column: 1 / -1;
+    }
+
+    .grille {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 600px) {
+    .filtres {
+      grid-template-columns: 1fr;
+    }
+
+    .grille {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

@@ -1,0 +1,146 @@
+---
+/** En-tête des pages intérieures : fil d'Ariane, titre, introduction, image facultative. */
+import ImageSlot from './ImageSlot.astro';
+
+interface Props {
+  titre: string;
+  surtitre?: string;
+  intro?: string;
+  ariane?: { libelle: string; lien?: string }[];
+  image?: { id: string; sujet: string };
+}
+
+const { titre, surtitre, intro, ariane = [], image } = Astro.props;
+---
+
+<section class:list={['entete-page', { 'avec-image': image }]}>
+  <svg class="arc" viewBox="0 0 1440 300" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M 700 320 Q 1100 -40 1500 120" pathLength="1"></path>
+  </svg>
+  <div class="conteneur grille">
+    <div class="texte">
+      <nav class="ariane entree-fondu" aria-label="Fil d’Ariane">
+        <ol>
+          <li><a href="/">Accueil</a></li>
+          {
+            ariane.map((a) => (
+              <li>{a.lien ? <a href={a.lien}>{a.libelle}</a> : <span aria-current="page">{a.libelle}</span>}</li>
+            ))
+          }
+        </ol>
+      </nav>
+      {surtitre && <p class="surtitre surtitre-clair entree-fondu">{surtitre}</p>}
+      <h1 class="entree">{titre}</h1>
+      {intro && <p class="intro entree" style="--delai:0.1s">{intro}</p>}
+      <slot />
+    </div>
+    {
+      image && (
+        <div class="image arche entree-image">
+          <ImageSlot id={image.id} format="paysage" sujet={image.sujet} />
+        </div>
+      )
+    }
+  </div>
+</section>
+
+<style>
+  .entete-page {
+    position: relative;
+    overflow: hidden;
+    background: var(--bleu);
+    color: #fff;
+    padding-block: var(--e-5) var(--e-6);
+  }
+
+  .arc {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+
+  .arc path {
+    fill: none;
+    stroke: var(--rouge);
+    stroke-width: 3;
+    vector-effect: non-scaling-stroke;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+  }
+
+  :global(.anim) .arc path {
+    stroke-dashoffset: 1;
+    animation: tracer 1.1s var(--ease-in-out) 0.3s forwards;
+  }
+
+  .grille {
+    position: relative;
+    display: grid;
+    gap: var(--e-5);
+    align-items: center;
+  }
+
+  .avec-image .grille {
+    grid-template-columns: 1.1fr 0.9fr;
+  }
+
+  h1 {
+    color: #fff;
+    margin-top: var(--e-2);
+    max-width: 22ch;
+  }
+
+  .surtitre-clair {
+    color: #ff8a8a;
+  }
+
+  .intro {
+    margin-top: var(--e-3);
+    max-width: 40rem;
+    font-size: var(--taille-l);
+    color: rgb(255 255 255 / 0.85);
+  }
+
+  .ariane ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin: 0 0 var(--e-3);
+    padding: 0;
+    list-style: none;
+    font-size: var(--taille-xs);
+    color: rgb(255 255 255 / 0.7);
+  }
+
+  .ariane li:not(:last-child)::after {
+    content: '/';
+    margin-left: 0.4rem;
+    opacity: 0.6;
+  }
+
+  .ariane a {
+    color: rgb(255 255 255 / 0.85);
+  }
+
+  .ariane a:hover {
+    color: #fff;
+  }
+
+  .image :global(.emplacement) {
+    background: rgb(255 255 255 / 0.92);
+  }
+
+  .image {
+    aspect-ratio: 5 / 4;
+    max-width: 34rem;
+    justify-self: end;
+  }
+
+  @media (max-width: 860px) {
+    .avec-image .grille {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

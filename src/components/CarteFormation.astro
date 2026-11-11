@@ -1,0 +1,120 @@
+---
+import { niveaux, domaines, type Formation } from '../data/formations';
+
+interface Props {
+  formation: Formation;
+}
+
+const { formation: f } = Astro.props;
+---
+
+<a
+  class="carte"
+  href={`/formations/${f.slug}`}
+  data-niveau={f.niveau}
+  data-domaine={f.domaine}
+  data-institut={f.institut ?? 'aucun'}
+  data-recherche={`${f.intitule} ${f.sigle ?? ''} ${f.niveau}`.toLowerCase()}
+>
+  <span class:list={['niveau', `niveau-${f.niveau.toLowerCase()}`]}>{niveaux[f.niveau].libelle}</span>
+  <h3>{f.intitule}</h3>
+  <p class="meta">
+    {niveaux[f.niveau].duree}
+    {f.institut && <> · {f.institut}</>}
+  </p>
+  <p class="domaine">{domaines[f.domaine].libelle}</p>
+  <span class="suite">
+    {f.fiche === 'detaillee' ? 'Voir la fiche' : 'En savoir plus'}
+  </span>
+</a>
+
+<style>
+  .carte {
+    position: relative;
+    display: grid;
+    align-content: start;
+    gap: 0.55rem;
+    height: 100%;
+    padding: var(--e-3);
+    border: 1px solid var(--filet);
+    border-radius: var(--rayon);
+    background: #fff;
+    color: var(--encre);
+    text-decoration: none;
+    overflow: hidden;
+    transition:
+      border-color 0.3s,
+      box-shadow 0.3s,
+      translate 0.2s ease;
+  }
+
+  .carte::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: var(--rouge);
+    transform: scaleY(0);
+    transform-origin: top;
+    transition: transform 0.25s var(--ease-out);
+  }
+
+  .carte:hover {
+    border-color: var(--bleu);
+    box-shadow: 0 18px 36px -24px rgb(9 20 59 / 0.5);
+    translate: 0 -2px;
+    color: var(--encre);
+  }
+
+  .carte:hover::before {
+    transform: scaleY(1);
+  }
+
+  .niveau {
+    justify-self: start;
+    padding: 0.15rem 0.6rem;
+    border-radius: 999px;
+    font-size: var(--taille-xs);
+    font-weight: 700;
+  }
+
+  .niveau-bts {
+    background: #fff1e0;
+    color: #8a4b00;
+  }
+
+  .niveau-licence {
+    background: var(--bleu-clair);
+    color: var(--bleu);
+  }
+
+  .niveau-master {
+    background: var(--rouge-clair);
+    color: var(--rouge);
+  }
+
+  h3 {
+    font-size: var(--taille-l);
+    line-height: 1.25;
+  }
+
+  .meta {
+    font-size: var(--taille-s);
+    font-weight: 600;
+    color: var(--encre);
+  }
+
+  .domaine {
+    font-size: var(--taille-s);
+    color: var(--encre-douce);
+  }
+
+  .suite {
+    margin-top: 0.4rem;
+    font-weight: 650;
+    font-size: var(--taille-s);
+    color: var(--bleu);
+  }
+</style>

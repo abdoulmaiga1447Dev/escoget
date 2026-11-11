@@ -1,0 +1,460 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import EntetePage from '../components/EntetePage.astro';
+import ImageSlot from '../components/ImageSlot.astro';
+import { etablissement as e } from '../data/etablissement';
+
+const anciennete = new Date().getFullYear() - e.creation;
+---
+
+<BaseLayout
+  titre="L’Université"
+  description="Histoire, mission, mot du Président et direction de l’Université ESCOGET, établissement privé d’enseignement supérieur à Abidjan depuis 1986."
+>
+  <EntetePage
+    titre="Une université tournée vers le monde professionnel"
+    surtitre="L’Université ESCOGET"
+    intro="Depuis 1986, l’Université ESCOGET forme des techniciens supérieurs, des cadres et des dirigeants prêts à faire gagner leur entreprise."
+    ariane={[{ libelle: 'L’Université' }]}
+    image={{ id: 'UNI-01', sujet: 'Bâtiment principal ou entrée du campus, vue d’ensemble lumineuse' }}
+  />
+
+  <!-- Présentation -->
+  <section class="section">
+    <div class="conteneur presentation">
+      <div class="presentation-texte" data-revele="gauche">
+        <h2>Une mission avant tout professionnelle</h2>
+        {e.presentation.map((p) => <p>{p}</p>)}
+      </div>
+      <ul class="chiffres" data-revele="droite">
+        {
+          e.chiffres.map((c) => (
+            <li>
+              <span class="valeur">{c.valeur}</span>
+              <span class="libelle">{c.libelle}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- Historique -->
+  <section class="section section-douce" id="histoire">
+    <div class="conteneur">
+      <div class="entete-section" data-revele>
+        <h2>{anciennete} ans d’enseignement supérieur</h2>
+      </div>
+      <ol class="frise">
+        {
+          e.historique.map((h) => (
+            <li data-revele>
+              <span class="annee">{h.annee}</span>
+              <p>{h.texte}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <!-- Mot du Président -->
+  <section class="section" id="mot-du-president">
+    <div class="conteneur president">
+      <div class="president-photo" data-revele="gauche">
+        <div class="arche"><ImageSlot id="ACC-06" format="portrait" sujet="Portrait officiel du Président, Dr ELETE AKA" /></div>
+        <p class="legende"><strong>{e.president.nom}</strong>{e.president.titre}, {e.nom}</p>
+      </div>
+      <div class="president-texte" data-revele="droite">
+        <h2>Formation et vie professionnelle s’imbriquent</h2>
+        {e.president.mot.map((p) => <p>{p}</p>)}
+        <p class="signature">{e.president.nom}</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Vision, mission, valeurs -->
+  <section class="section section-bleue sur-fonce">
+    <div class="conteneur">
+      <div class="entete-section" data-revele>
+        <h2>Vision, mission et valeurs</h2>
+      </div>
+      <div class="vmv">
+        <article data-revele>
+          <h3>Notre vision</h3>
+          <p>{e.vision}</p>
+        </article>
+        <article data-revele>
+          <h3>Notre mission</h3>
+          <p>{e.mission}</p>
+        </article>
+        <article data-revele>
+          <h3>Nos valeurs</h3>
+          <ul>{e.valeurs.map((v) => <li>{v}</li>)}</ul>
+        </article>
+      </div>
+      <p class="credo" data-revele>« {e.credo} »</p>
+    </div>
+  </section>
+
+  <!-- Direction -->
+  <section class="section" id="direction">
+    <div class="conteneur">
+      <div class="entete-section" data-revele>
+        <h2>L’équipe de direction</h2>
+      </div>
+      <ul class="direction">
+        {
+          e.direction.map((d) => (
+            <li data-revele>
+              <span class="initiales" aria-hidden="true">
+                {d.nom
+                  .replace(/^(Dr|Pr|M\.)\s+/, '')
+                  .split(' ')
+                  .slice(0, 2)
+                  .map((m) => m[0])
+                  .join('')}
+              </span>
+              <div>
+                <strong>{d.nom}</strong>
+                <span>{d.fonction}</span>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- Reconnaissance et partenaires -->
+  <section class="section section-douce">
+    <div class="conteneur deux">
+      <div data-revele="gauche">
+        <h2>Un établissement reconnu par l’État</h2>
+        <ul class="reconnaissance">
+          <li><strong>Reconnu par l’État</strong> depuis le {e.reconnaissanceEtat}</li>
+          <li><strong>{e.autorisation}</strong></li>
+          <li><strong>Programmes de Master</strong> validés par la commission pédagogique de l’UPESUP-CI</li>
+          <li><strong>Formation continue</strong> : le CFCP est agréé par le FNR depuis 1986 et par le FDFP depuis 1992</li>
+        </ul>
+      </div>
+      <div data-revele="droite">
+        <h2>Ouverts sur le monde professionnel</h2>
+        <ul class="partenaires">
+          {e.partenaires.map((p) => <li><strong>{p.nom}</strong><span>{p.texte}</span></li>)}
+        </ul>
+        <p class="visites">
+          Nos étudiants visitent régulièrement des entreprises de premier plan : {e.visitesEntreprises.join(', ')}.
+        </p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .presentation {
+    display: grid;
+    grid-template-columns: 1.3fr 0.7fr;
+    gap: var(--e-6);
+    align-items: start;
+  }
+
+  .presentation-texte {
+    display: grid;
+    gap: var(--e-3);
+  }
+
+  .presentation-texte h2 {
+    margin-bottom: var(--e-1);
+  }
+
+  .chiffres {
+    display: grid;
+    gap: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 4px solid var(--rouge);
+  }
+
+  .chiffres li {
+    display: grid;
+    padding: var(--e-3) 0;
+    border-bottom: 1px solid var(--filet);
+  }
+
+  .valeur {
+    font-size: var(--taille-2xl);
+    font-weight: 750;
+    color: var(--bleu);
+    line-height: 1.1;
+  }
+
+  .libelle {
+    color: var(--encre-douce);
+    font-size: var(--taille-s);
+  }
+
+  /* Frise */
+  .frise {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: var(--e-3);
+    margin: 0;
+    padding: var(--e-4) 0 0;
+    list-style: none;
+  }
+
+  .frise::before {
+    content: '';
+    position: absolute;
+    top: 0.55rem;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--bleu);
+  }
+
+  .frise li {
+    position: relative;
+    display: grid;
+    gap: var(--e-1);
+    align-content: start;
+  }
+
+  .frise li::before {
+    content: '';
+    position: absolute;
+    top: calc(var(--e-4) * -1);
+    left: 0;
+    width: 1.1rem;
+    height: 1.1rem;
+    border-radius: 50%;
+    background: #fff;
+    border: 3px solid var(--rouge);
+  }
+
+  .annee {
+    font-size: var(--taille-xl);
+    font-weight: 750;
+    color: var(--bleu);
+  }
+
+  .frise p {
+    color: var(--encre-douce);
+    font-size: var(--taille-s);
+  }
+
+  /* Président */
+  .president {
+    display: grid;
+    grid-template-columns: 0.6fr 1.4fr;
+    gap: var(--e-6);
+    align-items: start;
+  }
+
+  .president-photo {
+    display: grid;
+    gap: var(--e-2);
+    position: sticky;
+    top: 7rem;
+  }
+
+  .legende {
+    display: grid;
+    font-size: var(--taille-s);
+    color: var(--encre-douce);
+  }
+
+  .legende strong {
+    color: var(--bleu);
+    font-size: var(--taille-m);
+  }
+
+  .president-texte {
+    display: grid;
+    gap: var(--e-3);
+    max-width: 44rem;
+  }
+
+  .president-texte p:not(.surtitre):not(.signature) {
+    font-size: var(--taille-l);
+    line-height: 1.6;
+  }
+
+  .signature {
+    font-weight: 700;
+    color: var(--bleu);
+    font-style: italic;
+  }
+
+  /* Vision, mission, valeurs */
+  .section-bleue {
+    background: var(--bleu);
+    color: rgb(255 255 255 / 0.85);
+  }
+
+  .section-bleue h2,
+  .section-bleue h3 {
+    color: #fff;
+  }
+
+  .surtitre-clair {
+    color: #ff8a8a;
+  }
+
+  .vmv {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--e-3);
+  }
+
+  .vmv article {
+    display: grid;
+    align-content: start;
+    gap: var(--e-2);
+    padding: var(--e-4);
+    border: 1px solid rgb(255 255 255 / 0.15);
+    border-top: 4px solid var(--rouge);
+    border-radius: var(--rayon);
+    background: rgb(255 255 255 / 0.04);
+  }
+
+  .vmv ul {
+    display: grid;
+    gap: 0.4rem;
+    margin: 0;
+    padding-left: 1.1rem;
+  }
+
+  .credo {
+    margin-top: var(--e-5);
+    max-width: 50rem;
+    font-size: var(--taille-xl);
+    font-style: italic;
+    color: #fff;
+  }
+
+  /* Direction */
+  .direction {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--e-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .direction li {
+    display: flex;
+    align-items: center;
+    gap: var(--e-2);
+    padding: var(--e-3);
+    border: 1px solid var(--filet);
+    border-radius: var(--rayon);
+  }
+
+  .initiales {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 3.25rem;
+    height: 3.25rem;
+    border-radius: 50%;
+    background: var(--bleu);
+    color: #fff;
+    font-weight: 700;
+  }
+
+  .direction strong {
+    display: block;
+    color: var(--bleu);
+  }
+
+  .direction span {
+    font-size: var(--taille-s);
+    color: var(--encre-douce);
+  }
+
+  /* Reconnaissance et partenaires */
+  .deux {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--e-6);
+  }
+
+  .deux h2 {
+    margin-block: var(--e-2) var(--e-3);
+    font-size: var(--taille-xl);
+  }
+
+  .reconnaissance,
+  .partenaires {
+    display: grid;
+    gap: var(--e-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .reconnaissance li,
+  .partenaires li {
+    padding: var(--e-2) var(--e-3);
+    background: #fff;
+    border-left: 4px solid var(--bleu);
+    border-radius: 0 var(--rayon) var(--rayon) 0;
+  }
+
+  .partenaires li {
+    display: grid;
+  }
+
+  .partenaires span {
+    font-size: var(--taille-s);
+    color: var(--encre-douce);
+  }
+
+  .visites {
+    margin-top: var(--e-3);
+    color: var(--encre-douce);
+  }
+
+  @media (max-width: 960px) {
+    .presentation,
+    .president,
+    .deux {
+      grid-template-columns: 1fr;
+      gap: var(--e-4);
+    }
+
+    .president-photo {
+      position: static;
+      max-width: 20rem;
+    }
+
+    .frise {
+      grid-template-columns: 1fr;
+      padding: 0 0 0 var(--e-4);
+    }
+
+    .frise::before {
+      top: 0;
+      bottom: 0;
+      left: 0.5rem;
+      right: auto;
+      width: 2px;
+      height: auto;
+    }
+
+    .frise li::before {
+      top: 0.4rem;
+      left: calc(var(--e-4) * -1);
+    }
+
+    .vmv,
+    .direction {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

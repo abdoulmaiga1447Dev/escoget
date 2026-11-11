@@ -1,0 +1,615 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import EntetePage from '../../components/EntetePage.astro';
+import CarteFormation from '../../components/CarteFormation.astro';
+import { formations, niveaux, domaines, type Formation } from '../../data/formations';
+import { fiches, reglesLicence, reglesMaster } from '../../data/fiches';
+import { etablissement } from '../../data/etablissement';
+
+export function getStaticPaths() {
+  return formations.map((f) => ({ params: { slug: f.slug }, props: { formation: f } }));
+}
+
+const { formation: f } = Astro.props as { formation: Formation };
+const fiche = fiches[f.slug];
+const niveau = niveaux[f.niveau];
+const domaine = domaines[f.domaine];
+const institut = etablissement.instituts.find((i) => i.sigle === f.institut);
+
+const titre = `${niveau.libelle} ${f.intitule}`;
+const feminin = f.niveau === 'Licence';
+const article = feminin ? 'La' : 'Le';
+const propose = feminin ? 'proposée' : 'proposé';
+const releve = feminin ? 'Elle relève' : 'Il relève';
+const proches = formations
+  .filter((x) => x.slug !== f.slug && (x.domaine === f.domaine || x.intitule === f.intitule))
+  .sort((a, b) => Number(b.intitule === f.intitule) - Number(a.intitule === f.intitule))
+  .slice(0, 3);
+
+const totalHeures = (heures: (number | undefined)[]) =>
+  heures.every((h) => typeof h === 'number') ? heures.reduce((a, b) => a! + b!, 0) : undefined;
+---
+
+<BaseLayout
+  titre={titre}
+  description={fiche?.accroche ?? `${titre} à l’Université ESCOGET : ${niveau.duree}, ${domaine.libelle.toLowerCase()}.`}
+>
+  <EntetePage
+    titre={f.intitule}
+    surtitre={niveau.libelle}
+    intro={fiche?.accroche}
+    ariane={[{ libelle: 'Formations', lien: '/formations' }, { libelle: f.intitule }]}
+  >
+    <ul class="faits entree" style="--delai:0.16s">
+      <li><span>Durée</span>{niveau.duree}</li>
+      <li><span>Accès</span>{niveau.acces}</li>
+      {institut && <li><span>Institut</span>{institut.sigle}</li>}
+      <li><span>Domaine</span>{domaine.libelle}</li>
+    </ul>
+    <div class="actions entree" style="--delai:0.2s">
+      <a class="bouton bouton-principal" href={`/admissions?formation=${f.slug}#preinscription`}>
+        Demander une admission
+      </a>
+      {!fiche && <a class="bouton bouton-secondaire" href={`/contact?objet=programme&formation=${f.slug}`}>Demander le programme</a>}
+    </div>
+  </EntetePage>
+
+  {
+    fiche ? (
+      <div class="conteneur corps">
+        <nav class="sommaire" aria-label="Sur cette page">
+          <p class="sommaire-titre">Sur cette page</p>
+          <ol>
+            <li><a href="#objectifs">Objectifs</a></li>
+            <li><a href="#admission">Admission</a></li>
+            <li><a href="#programme">Programme</a></li>
+            <li><a href="#stages">Stages et diplôme</a></li>
+            <li><a href="#debouches">Débouchés</a></li>
+          </ol>
+        </nav>
+
+        <div class="contenu">
+          <section id="objectifs" class="bloc" data-revele>
+            <h2>Objectifs de la formation</h2>
+            <ul class="liste-puces">{fiche.objectifs.map((o) => <li>{o}</li>)}</ul>
+            <h3>Compétences visées</h3>
+            <ul class="etiquettes">{fiche.competences.map((c) => <li>{c}</li>)}</ul>
+          </section>
+
+          <section id="admission" class="bloc" data-revele>
+            <h2>Conditions d’admission</h2>
+            <ol class="etapes">{fiche.admission.map((a) => <li>{a}</li>)}</ol>
+          </section>
+
+          <section id="programme" class="bloc" data-revele>
+            <h2>Programme</h2>
+            <p class="note">
+              Unités d’enseignement (UE) par semestre, avec leur volume de cours en présentiel. Cliquez sur un semestre pour le déplier.
+            </p>
+            <div class="semestres">
+              {fiche.semestres.map((s, i) => {
+                const total = s.ues.length ? totalHeures(s.ues.map((u) => u.heures)) : undefined;
+                return (
+                  <details class="semestre" open={i === 0}>
+                    <summary>
+                      <span class="semestre-nom">{s.nom}</span>
+                      <span class="semestre-annee">{s.annee}</span>
+                      <span class="semestre-info">{s.ues.length ? `${s.ues.length} UE${total ? ` · ${total} h` : ''}` : 'Stage et mémoire'}</span>
+                    </summary>
+                    {s.note && <p class="semestre-note">{s.note}</p>}
+                    {s.ues.length > 0 && (
+                      <ul class="ues">
+                        {s.ues.map((u) => (
+                          <li>
+                            <div class="ue-ligne">
+                              <span class="ue-titre">{u.intitule}</span>
+                              {u.heures && <span class="ue-heures">{u.heures} h</span>}
+                            </div>
+                            {u.ecue && <p class="ue-ecue">{u.ecue.join(' · ')}</p>}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </details>
+                );
+              })}
+            </div>
+          </section>
+
+          <section id="stages" class="bloc" data-revele>
+            <h2>Stages, évaluation et diplôme</h2>
+            <div class="trois">
+              <div>
+                <h3>Stages</h3>
+                <ul class="liste-puces">{fiche.stages.map((s) => <li>{s}</li>)}</ul>
+              </div>
+              <div>
+                <h3>Évaluation</h3>
+                <ul class="liste-puces">{reglesLicence.evaluation.map((r) => <li>{r}</li>)}</ul>
+              </div>
+              <div>
+                <h3>Obtention du diplôme</h3>
+                <ul class="liste-puces">{reglesLicence.diplome.map((r) => <li>{r}</li>)}</ul>
+              </div>
+            </div>
+            {fiche.rythme && <p class="rythme"><strong>Rythme.</strong> {fiche.rythme}</p>}
+          </section>
+
+          <section id="debouches" class="bloc" data-revele>
+            <h2>Débouchés et métiers</h2>
+            <ul class="metiers">{fiche.debouches.map((d) => <li>{d}</li>)}</ul>
+          </section>
+
+          {fiche.responsable && (
+            <aside class="responsable" data-revele>
+              <p class="surtitre">Responsable de la formation</p>
+              <p><strong>{fiche.responsable.nom}</strong>, {fiche.responsable.fonction.toLowerCase()}</p>
+            </aside>
+          )}
+        </div>
+      </div>
+    ) : (
+      <section class="section">
+        <div class="conteneur courte">
+          <div class="bloc" data-revele>
+            <h2>À propos de cette formation</h2>
+            <p>
+              {article} {niveau.libelle} « {f.intitule} »
+              {institut ? ` est ${propose} par l’${institut.sigle}, ${institut.nom}. ` : ` est ${propose} par l’Université ESCOGET. `}
+              {releve} de l’{domaine.ufr}. Le programme détaillé de cette formation sera bientôt disponible sur le site. En attendant,
+              notre service de scolarité vous le transmet sur simple demande.
+            </p>
+            <a class="bouton bouton-principal" href={`/contact?objet=programme&formation=${f.slug}`}>
+              Demander le programme
+            </a>
+          </div>
+          {f.niveau === 'Licence' && (
+            <div class="bloc" data-revele>
+              <h2>Ce qui est commun à toutes nos Licences professionnelles</h2>
+              <div class="trois">
+                <div>
+                  <h3>Organisation</h3>
+                  <ul class="liste-puces">{reglesLicence.organisation.map((r) => <li>{r}</li>)}</ul>
+                </div>
+                <div>
+                  <h3>Stages</h3>
+                  <ul class="liste-puces">{reglesLicence.stages.map((r) => <li>{r}</li>)}</ul>
+                </div>
+                <div>
+                  <h3>Diplôme</h3>
+                  <ul class="liste-puces">{reglesLicence.diplome.map((r) => <li>{r}</li>)}</ul>
+                </div>
+              </div>
+            </div>
+          )}
+          {f.niveau === 'Master' && (
+            <div class="bloc" data-revele>
+              <h2>Organisation des Masters professionnels</h2>
+              <ul class="liste-puces">{reglesMaster.organisation.map((r) => <li>{r}</li>)}</ul>
+            </div>
+          )}
+        </div>
+      </section>
+    )
+  }
+
+  {
+    proches.length > 0 && (
+      <section class="section section-douce">
+        <div class="conteneur">
+          <div class="entete-section" data-revele>
+            <h2>Formations proches</h2>
+          </div>
+          <ul class="proches">
+            {proches.map((p) => (
+              <li data-revele>
+                <CarteFormation formation={p} />
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    )
+  }
+</BaseLayout>
+
+<style>
+  .faits {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--e-2) var(--e-4);
+    margin: var(--e-4) 0 0;
+    padding: var(--e-3) 0 0;
+    list-style: none;
+    border-top: 1px solid rgb(255 255 255 / 0.2);
+    color: #fff;
+    font-weight: 600;
+  }
+
+  .faits span {
+    display: block;
+    font-size: var(--taille-xs);
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgb(255 255 255 / 0.6);
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--e-2);
+    margin-top: var(--e-4);
+  }
+
+  /* Fiche détaillée */
+  .corps {
+    display: grid;
+    grid-template-columns: 14rem minmax(0, 1fr);
+    gap: var(--e-6);
+    padding-block: var(--e-6);
+  }
+
+  .sommaire {
+    position: sticky;
+    top: 6.5rem;
+    align-self: start;
+  }
+
+  .sommaire-titre {
+    margin-bottom: var(--e-2);
+    font-size: var(--taille-xs);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--encre-douce);
+  }
+
+  .sommaire ol {
+    display: grid;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-left: 2px solid var(--filet);
+  }
+
+  .sommaire a {
+    display: block;
+    margin-left: -2px;
+    padding: 0.5rem 0 0.5rem 1rem;
+    border-left: 2px solid transparent;
+    color: var(--encre-douce);
+    font-weight: 600;
+    text-decoration: none;
+    transition:
+      color 0.2s,
+      border-color 0.2s;
+  }
+
+  .sommaire a:hover {
+    color: var(--bleu);
+    border-color: var(--rouge);
+  }
+
+  .contenu {
+    display: grid;
+    gap: var(--e-6);
+  }
+
+  .bloc {
+    display: grid;
+    gap: var(--e-3);
+    scroll-margin-top: 7rem;
+  }
+
+  .bloc h2 {
+    font-size: var(--taille-xl);
+  }
+
+  .bloc h3 {
+    font-size: var(--taille-m);
+  }
+
+  .liste-puces {
+    display: grid;
+    gap: 0.6rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .liste-puces li {
+    position: relative;
+    padding-left: 1.4rem;
+  }
+
+  .liste-puces li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.62em;
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 50%;
+    border: 2px solid var(--rouge);
+  }
+
+  .etiquettes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .etiquettes li {
+    padding: 0.4rem 0.85rem;
+    border-radius: 999px;
+    background: var(--bleu-clair);
+    color: var(--bleu);
+    font-size: var(--taille-s);
+    font-weight: 600;
+  }
+
+  .etapes {
+    display: grid;
+    gap: var(--e-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: etape;
+  }
+
+  .etapes li {
+    position: relative;
+    padding: var(--e-2) var(--e-2) var(--e-2) 3.5rem;
+    border: 1px solid var(--filet);
+    border-radius: var(--rayon);
+    counter-increment: etape;
+  }
+
+  .etapes li::before {
+    content: counter(etape);
+    position: absolute;
+    left: var(--e-2);
+    top: 50%;
+    translate: 0 -50%;
+    display: grid;
+    place-items: center;
+    width: 1.9rem;
+    height: 1.9rem;
+    border-radius: 50%;
+    background: var(--bleu);
+    color: #fff;
+    font-weight: 700;
+    font-size: var(--taille-s);
+  }
+
+  .note {
+    color: var(--encre-douce);
+    font-size: var(--taille-s);
+  }
+
+  .semestres {
+    display: grid;
+    gap: var(--e-1);
+  }
+
+  .semestre {
+    border: 1px solid var(--filet);
+    border-radius: var(--rayon);
+    background: #fff;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .semestre[open] {
+    border-color: var(--bleu);
+  }
+
+  summary {
+    display: grid;
+    grid-template-columns: auto 1fr auto auto;
+    align-items: center;
+    gap: var(--e-2);
+    padding: var(--e-2) var(--e-3);
+    cursor: pointer;
+    list-style: none;
+  }
+
+  summary::-webkit-details-marker {
+    display: none;
+  }
+
+  summary::after {
+    content: '+';
+    font-size: 1.4rem;
+    font-weight: 400;
+    color: var(--rouge);
+    transition: transform 0.2s ease;
+  }
+
+  .semestre[open] summary::after {
+    transform: rotate(45deg);
+  }
+
+  summary:hover {
+    background: var(--fond-doux);
+  }
+
+  .semestre-nom {
+    font-weight: 700;
+    color: var(--bleu);
+  }
+
+  .semestre-annee {
+    color: var(--encre-douce);
+    font-size: var(--taille-s);
+  }
+
+  .semestre-info {
+    font-size: var(--taille-s);
+    font-weight: 600;
+    color: var(--encre-douce);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .semestre-note {
+    padding: 0 var(--e-3) var(--e-3);
+  }
+
+  .ues {
+    margin: 0;
+    padding: 0 var(--e-3) var(--e-2);
+    list-style: none;
+  }
+
+  .ues li {
+    padding-block: 0.8rem;
+    border-top: 1px solid var(--filet);
+  }
+
+  .ue-ligne {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--e-2);
+  }
+
+  .ue-titre {
+    font-weight: 600;
+  }
+
+  .ue-heures {
+    flex: none;
+    font-weight: 650;
+    color: var(--bleu);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .ue-ecue {
+    margin-top: 0.25rem;
+    font-size: var(--taille-s);
+    color: var(--encre-douce);
+  }
+
+  .trois {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--e-4);
+  }
+
+  .trois h3 {
+    margin-bottom: var(--e-2);
+  }
+
+  .trois .liste-puces {
+    font-size: var(--taille-s);
+  }
+
+  .rythme {
+    padding: var(--e-2) var(--e-3);
+    border-left: 4px solid var(--rouge);
+    background: var(--fond-doux);
+  }
+
+  .metiers {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: metier;
+  }
+
+  .metiers li {
+    padding: 0.85rem 0;
+    border-bottom: 1px solid var(--filet);
+    font-weight: 600;
+  }
+
+  .metiers li::before {
+    content: '→';
+    margin-right: 0.6rem;
+    color: var(--rouge);
+  }
+
+  .responsable {
+    display: grid;
+    gap: var(--e-1);
+    padding: var(--e-3);
+    border-radius: var(--rayon);
+    background: var(--bleu);
+    color: #fff;
+  }
+
+  .responsable .surtitre {
+    color: #ff8a8a;
+  }
+
+  /* Fiche courte */
+  .courte {
+    display: grid;
+    gap: var(--e-6);
+    max-width: 60rem;
+  }
+
+  .courte .bloc {
+    justify-items: start;
+  }
+
+  .proches {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--e-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (max-width: 960px) {
+    .corps {
+      grid-template-columns: 1fr;
+      gap: var(--e-4);
+    }
+
+    .sommaire {
+      position: static;
+    }
+
+    .sommaire ol {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      border: 0;
+    }
+
+    .sommaire a {
+      margin: 0;
+      padding: 0.4rem 0.8rem;
+      border: 1px solid var(--filet);
+      border-radius: 999px;
+    }
+
+    .trois,
+    .proches {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .metiers {
+      grid-template-columns: 1fr;
+    }
+
+    summary {
+      grid-template-columns: 1fr auto;
+    }
+
+    .semestre-annee,
+    .semestre-info {
+      grid-column: 1;
+    }
+  }
+</style>

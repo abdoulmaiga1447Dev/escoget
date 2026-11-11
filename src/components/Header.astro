@@ -1,0 +1,244 @@
+---
+import { menu } from '../data/navigation';
+
+const chemin = Astro.url.pathname;
+const estActif = (lien: string) => chemin === lien || chemin.startsWith(lien + '/');
+---
+
+<header class="entete">
+  <div class="bandeau">
+    <div class="conteneur bandeau-int">
+      <span>Établissement privé d’enseignement supérieur · Reconnu par l’État depuis 1987</span>
+      <a href="/admissions">Inscriptions</a>
+    </div>
+  </div>
+
+  <div class="conteneur barre">
+    <a class="marque" href="/" aria-label="Université ESCOGET, accueil">
+      <img src="/images/logo/logo-universite-escoget.svg" alt="Université ESCOGET" width="150" height="77" />
+    </a>
+
+    <button class="ouvrir-menu" type="button" aria-expanded="false" aria-controls="menu-principal">
+      <span class="barres" aria-hidden="true"></span>
+      <span>Menu</span>
+    </button>
+
+    <nav id="menu-principal" class="navigation" aria-label="Menu principal">
+      <ul>
+        {
+          menu.map((item) => (
+            <li>
+              <a href={item.lien} aria-current={estActif(item.lien) ? 'page' : undefined}>
+                {item.libelle}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+      <a class="bouton bouton-principal" href="/admissions#preinscription">Demander une admission</a>
+    </nav>
+  </div>
+</header>
+
+<script>
+  const bouton = document.querySelector<HTMLButtonElement>('.ouvrir-menu');
+  const nav = document.getElementById('menu-principal');
+  bouton?.addEventListener('click', () => {
+    const ouvert = bouton.getAttribute('aria-expanded') === 'true';
+    bouton.setAttribute('aria-expanded', String(!ouvert));
+    nav?.classList.toggle('ouverte', !ouvert);
+  });
+</script>
+
+<style>
+  .entete {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: #fff;
+    border-bottom: 1px solid var(--filet);
+  }
+
+  /* Ombre au défilement : seule l'opacité change, la taille de l'en-tête reste fixe */
+  .entete::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    height: 16px;
+    background: linear-gradient(rgb(9 20 59 / 0.12), transparent);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+  }
+
+  .entete.defile::after {
+    opacity: 1;
+  }
+
+  .bandeau {
+    background: var(--bleu);
+    color: #fff;
+    font-size: var(--taille-xs);
+  }
+
+  .bandeau-int {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-block: 0.45rem;
+  }
+
+  .bandeau a {
+    color: #fff;
+    font-weight: 600;
+  }
+
+  .barre {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding-block: 0.75rem;
+  }
+
+  .marque img {
+    width: 132px;
+    height: auto;
+  }
+
+  .navigation {
+    display: flex;
+    align-items: center;
+    gap: 1.75rem;
+  }
+
+  .navigation ul {
+    display: flex;
+    gap: 1.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .navigation ul a {
+    position: relative;
+    padding-block: 0.5rem;
+    color: var(--bleu);
+    font-weight: 600;
+    font-size: var(--taille-s);
+    text-decoration: none;
+  }
+
+  .navigation ul a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 2px;
+    background: var(--rouge);
+    transform: scaleX(0);
+    transition: transform 0.2s;
+  }
+
+  .navigation ul a:hover::after,
+  .navigation ul a[aria-current='page']::after {
+    transform: scaleX(1);
+  }
+
+  .ouvrir-menu {
+    display: none;
+  }
+
+  @media (max-width: 1080px) {
+    .bandeau-int span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .ouvrir-menu {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      min-height: 2.75rem;
+      padding: 0.5rem 0.9rem;
+      border: 1px solid var(--filet);
+      border-radius: var(--rayon);
+      background: #fff;
+      color: var(--bleu);
+      font: inherit;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .barres,
+    .barres::before,
+    .barres::after {
+      display: block;
+      width: 18px;
+      height: 2px;
+      background: currentColor;
+    }
+
+    .barres {
+      position: relative;
+    }
+
+    .barres::before,
+    .barres::after {
+      content: '';
+      position: absolute;
+      left: 0;
+    }
+
+    .barres::before {
+      top: -6px;
+    }
+
+    .barres::after {
+      top: 6px;
+    }
+
+    .navigation {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 1rem;
+      padding: 1rem max(1.25rem, env(safe-area-inset-right, 0px)) 1.5rem max(1.25rem, env(safe-area-inset-left, 0px));
+      background: #fff;
+      border-bottom: 1px solid var(--filet);
+      box-shadow: 0 12px 24px rgb(9 20 59 / 0.08);
+    }
+
+    .navigation.ouverte {
+      display: flex;
+    }
+
+    .navigation ul {
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .navigation ul a {
+      display: block;
+      padding: 0.85rem 0;
+      border-bottom: 1px solid var(--filet);
+      font-size: var(--taille-m);
+    }
+
+    .navigation ul a::after {
+      display: none;
+    }
+
+    .navigation ul a[aria-current='page'] {
+      color: var(--rouge);
+    }
+  }
+</style>

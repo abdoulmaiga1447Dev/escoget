@@ -1,0 +1,873 @@
+---
+/**
+ * Accueil. Direction de design :
+ * - motif signature : l'arche, reprise de l'arc du logo, pour toutes les photos ;
+ * - titres en Archivo élargi très gras, texte courant en largeur normale ;
+ * - bleu nuit dominant, rouge rare (actions, chiffres) ;
+ * - un seul moment orchestré à l'ouverture (arche qui s'ouvre, titre mot par mot, arc qui se dessine),
+ *   puis la profondeur des photos au défilement et le bandeau des formations.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ImageSlot from '../components/ImageSlot.astro';
+import { etablissement as e } from '../data/etablissement';
+import { formations, niveaux, compterParNiveau, type Niveau } from '../data/formations';
+
+const titre = 'Former des professionnels prêts pour le monde de l’entreprise';
+const mots = titre.split(' ');
+
+const listeNiveaux: { cle: Niveau; texte: string }[] = [
+  { cle: 'BTS', texte: 'Deux ans pour entrer vite dans la vie active, en gestion ou en technologie.' },
+  { cle: 'Licence', texte: 'Trois ans en système LMD, avec un stage chaque année et un mémoire en entreprise.' },
+  { cle: 'Master', texte: 'Deux ans pour se spécialiser et accéder aux fonctions de cadre et de dirigeant.' },
+];
+
+const [ihecg, ihet, cfcp] = e.instituts;
+const defilant = formations.map((f) => ({ texte: f.intitule, niveau: f.niveau, slug: f.slug }));
+---
+
+<BaseLayout titre="Accueil">
+  <!-- Ouverture : le seul moment orchestré de la page -->
+  <section class="ouverture">
+    <div class="conteneur ouverture-grille">
+      <div class="ouverture-texte">
+        <h1 aria-label={titre}>
+          {
+            mots.map((m, i) => (
+              <>
+                <span class="mot" aria-hidden="true" style={`--i:${i}`}>{m}</span>{' '}
+              </>
+            ))
+          }
+        </h1>
+        <p class="chapeau">
+          BTS, Licences et Masters professionnels en gestion, commerce, droit et technologies, à Abidjan depuis 1986.
+        </p>
+        <div class="actions">
+          <a class="bouton bouton-principal" href="/formations">Découvrir les formations</a>
+          <a class="bouton bouton-clair" href="/admissions#preinscription">Demander une admission</a>
+        </div>
+      </div>
+
+      <div class="ouverture-visuel">
+        <div class="arche-cadre">
+          <!-- Arc concentrique à l'arche : même centre, rayon 4 % plus grand -->
+          <svg class="arc" viewBox="0 0 100 54" aria-hidden="true">
+            <path d="M 2 52 A 48 48 0 0 1 98 52" pathLength="1"></path>
+          </svg>
+          <div class="arche arche-ouverture">
+            <ImageSlot id="ACC-01" format="portrait" sujet="Étudiants souriants sur le campus, en tenue de l’école" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Les faits, dans une phrase plutôt qu'en tuiles de chiffres -->
+  <section class="faits">
+    <p class="conteneur" data-revele>
+      Depuis <strong>1986</strong>, l’Université ESCOGET forme aux métiers de l’entreprise. Aujourd’hui,
+      <strong>{formations.length} formations</strong> du BTS au Master, deux instituts et <strong>1&nbsp;590 places</strong> sur deux
+      sites à Abidjan, reconnus par l’État depuis <strong>1987</strong>.
+    </p>
+  </section>
+
+  <!-- Niveaux de diplôme : une liste lisible, pas des cartes identiques -->
+  <section class="section">
+    <div class="conteneur">
+      <h2 class="titre-section" data-revele>Choisissez votre niveau</h2>
+      <ul class="niveaux">
+        {
+          listeNiveaux.map((n) => (
+            <li data-revele>
+              <a class="niveau" href={`/formations?niveau=${n.cle}`}>
+                <span class="niveau-nom">{niveaux[n.cle].libelle}</span>
+                <span class="niveau-duree">{niveaux[n.cle].duree}</span>
+                <span class="niveau-texte">{n.texte}</span>
+                <span class="niveau-compte">{compterParNiveau(n.cle)} formations</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- Bandeau défilant des formations -->
+  <section class="defilant" aria-label="Nos formations">
+    <div class="defilant-piste">
+      {
+        [0, 1].map((copie) => (
+          <ul class="defilant-liste" aria-hidden={copie === 1 ? 'true' : undefined}>
+            {defilant.map((f) => (
+              <li>
+                <a href={`/formations/${f.slug}`} tabindex={copie === 1 ? -1 : undefined}>
+                  <span class="defilant-niveau">{f.niveau}</span>
+                  {f.texte}
+                </a>
+              </li>
+            ))}
+          </ul>
+        ))
+      }
+    </div>
+  </section>
+
+  <!-- Instituts : deux grandes arches, le cabinet de formation continue en bandeau -->
+  <section class="section section-douce">
+    <div class="conteneur">
+      <h2 class="titre-section" data-revele>Deux instituts, un même cap : l’emploi</h2>
+      <div class="instituts">
+        {
+          [
+            { inst: ihecg, id: 'ACC-02', sujet: 'Cours de gestion : étudiants en salle, enseignant au tableau' },
+            { inst: ihet, id: 'ACC-03', sujet: 'Travaux pratiques en salle informatique' },
+          ].map(({ inst, id, sujet }) => (
+            <a class="institut" href={inst.lien} data-revele>
+              <div class="arche institut-arche">
+                <ImageSlot id={id} format="portrait" sujet={sujet} />
+              </div>
+              <p class="institut-sigle">{inst.sigle}</p>
+              <h3>{inst.nom}</h3>
+              <p class="institut-texte">{inst.texte}</p>
+            </a>
+          ))
+        }
+      </div>
+      <a class="cfcp" href={cfcp.lien} data-revele>
+        <span class="cfcp-sigle">{cfcp.sigle}</span>
+        <span class="cfcp-texte">
+          <strong>Entreprises et salariés :</strong> formation continue, conseil, recrutement et placement des diplômés.
+        </span>
+        <span class="cfcp-lien">Découvrir le CFCP</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- Atouts -->
+  <section class="section">
+    <div class="conteneur atouts-grille">
+      <div class="arche atouts-arche" data-revele>
+        <ImageSlot id="ACC-05" format="portrait" sujet="Étudiant en stage dans une entreprise" />
+      </div>
+      <div>
+        <h2 class="titre-section" data-revele>Une formation tournée vers l’emploi</h2>
+        <p class="atouts-intro" data-revele>{e.mission}</p>
+        <dl class="atouts">
+          {
+            e.atouts.map((a) => (
+              <div data-revele>
+                <dt>{a.titre}</dt>
+                <dd>{a.texte}</dd>
+              </div>
+            ))
+          }
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <!-- Mot du Président -->
+  <section class="president">
+    <div class="conteneur president-grille">
+      <figure>
+        <blockquote data-revele>
+          <p>{e.president.extrait}</p>
+        </blockquote>
+        <figcaption data-revele>
+          <span class="arche president-portrait">
+            <ImageSlot id="ACC-06" format="carre" sujet="Portrait officiel du Président, Dr ELETE AKA" />
+          </span>
+          <span>
+            <strong>{e.president.nom}</strong>
+            {e.president.titre} de l’{e.nom}
+          </span>
+        </figcaption>
+      </figure>
+      <a class="lien-discret" href="/universite#mot-du-president" data-revele>Lire le mot du Président</a>
+    </div>
+  </section>
+
+  <!-- Vie étudiante -->
+  <section class="section">
+    <div class="conteneur">
+      <div class="vie-entete">
+        <h2 class="titre-section" data-revele>Bien plus que des cours</h2>
+        <p data-revele>
+          Le bureau des étudiants {e.vieEtudiante.bureau}, une dizaine d’associations, des compétitions et les journées de
+          l’excellence : la vie du campus prépare aussi à la vie professionnelle.
+        </p>
+      </div>
+      <div class="vie-galerie">
+        <div class="arche vie-1" data-revele>
+          <ImageSlot id="ACC-07" format="portrait" sujet="Remise de diplôme devant la bannière ESCOGET" />
+        </div>
+        <div class="arche vie-2" data-revele>
+          <ImageSlot id="ACC-08" format="portrait" sujet="Journées culturelles : étudiants en tenues traditionnelles" />
+        </div>
+        <div class="arche vie-3" data-revele>
+          <ImageSlot id="ACC-09" format="portrait" sujet="Étudiants concentrés en salle de cours" />
+        </div>
+      </div>
+      <a class="lien-discret" href="/vie-etudiante">Découvrir la vie étudiante</a>
+    </div>
+  </section>
+
+  <!-- Appel à l'admission -->
+  <section class="appel">
+    <div class="conteneur appel-int" data-revele>
+      <h2>Votre place est à l’Université ESCOGET.</h2>
+      <div class="actions">
+        <a class="bouton bouton-blanc" href="/admissions#preinscription">Demander une admission</a>
+        <a class="bouton bouton-contour-blanc" href="/contact">Poser une question</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* ---------- Ouverture ---------- */
+  .ouverture {
+    background: var(--bleu);
+    color: #fff;
+    padding-block: var(--e-6) 0;
+    overflow: hidden;
+  }
+
+  .ouverture-grille {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+    gap: var(--e-5);
+    align-items: end;
+  }
+
+  .ouverture-texte {
+    padding-bottom: var(--e-6);
+  }
+
+  .ouverture h1 {
+    color: #fff;
+    font-size: clamp(2.3rem, 1.2rem + 3.6vw, 4.4rem);
+    line-height: 0.98;
+    max-width: 14ch;
+  }
+
+  .mot {
+    display: inline-block;
+  }
+
+  .chapeau {
+    margin-top: var(--e-4);
+    max-width: 34rem;
+    font-size: var(--taille-l);
+    line-height: 1.55;
+    color: rgb(255 255 255 / 0.82);
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--e-2);
+    margin-top: var(--e-4);
+  }
+
+  .bouton-clair {
+    color: #fff;
+    border-color: rgb(255 255 255 / 0.5);
+  }
+
+  .bouton-clair:hover {
+    background: #fff;
+    border-color: #fff;
+    color: var(--bleu);
+  }
+
+  /* Le visuel : une grande arche posée sur le bas du bandeau, l'arc rouge du logo au-dessus */
+  .ouverture-visuel {
+    position: relative;
+    padding-top: 2.5rem;
+  }
+
+  .arche-cadre {
+    position: relative;
+  }
+
+  /* L'arc est 8 % plus large que l'arche et centré sur elle. Son centre (y = 52/54 de sa hauteur)
+     est aligné sur celui du demi-cercle de l'arche (à une demi-largeur du haut) : la marge négative,
+     exprimée en % de la largeur, remonte l'arc de 6,2 %. */
+  .arc {
+    position: absolute;
+    top: 0;
+    left: -4%;
+    width: 108%;
+    max-width: none; /* la règle globale « svg { max-width: 100% } » le brideait */
+    margin-top: -6.2%;
+    overflow: visible;
+    z-index: 2;
+  }
+
+  .arc path {
+    fill: none;
+    stroke: var(--rouge);
+    stroke-width: 1.3; /* unités du viewBox (100 de large) : environ 4 px sur ordinateur */
+    stroke-linecap: round;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+  }
+
+  .arche-ouverture {
+    border-radius: 999px 999px 0 0;
+  }
+
+  .arche-ouverture :global(.emplacement) {
+    background: rgb(255 255 255 / 0.92);
+  }
+
+  /* Le moment orchestré : le titre monte mot par mot (principal), l'arche s'ouvre (secondaire),
+     l'arc se dessine en dernier (signature). Une seule fois, au chargement. */
+  :global(.anim) .mot {
+    animation: mot-monte 0.7s var(--ease-out) both;
+    animation-delay: calc(var(--i) * 55ms);
+  }
+
+  :global(.anim) .chapeau,
+  :global(.anim) .actions {
+    animation: fondu 0.6s ease both;
+    animation-delay: 0.45s;
+  }
+
+  :global(.anim) .arche-ouverture {
+    animation: arche-ouvre 1.1s var(--ease-in-out) 0.15s both;
+  }
+
+  :global(.anim) .arche-ouverture :global(.image) {
+    animation: photo-recule 1.4s var(--ease-out) 0.15s both;
+  }
+
+  :global(.anim) .arc path {
+    stroke-dashoffset: 1;
+    animation: tracer 1s var(--ease-in-out) 0.8s forwards;
+  }
+
+  @keyframes mot-monte {
+    from {
+      opacity: 0;
+      transform: translateY(0.45em);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes arche-ouvre {
+    from {
+      clip-path: inset(100% 0 0 0 round 999px 999px 0 0);
+    }
+    to {
+      clip-path: inset(0 0 0 0 round 999px 999px 0 0);
+    }
+  }
+
+  @keyframes photo-recule {
+    from {
+      transform: scale(1.18);
+    }
+    to {
+      transform: none;
+    }
+  }
+
+  /* ---------- Les faits ---------- */
+  .faits {
+    padding-block: var(--e-6);
+    border-bottom: 1px solid var(--filet);
+  }
+
+  .faits p {
+    font-size: clamp(1.35rem, 1rem + 1.5vw, 2.1rem);
+    font-weight: 500;
+    line-height: 1.35;
+    color: var(--bleu);
+    text-wrap: pretty;
+  }
+
+  .faits strong {
+    font-weight: 800;
+    font-stretch: 118%;
+    color: var(--rouge);
+  }
+
+  /* ---------- Titres de section ---------- */
+  .titre-section {
+    margin-bottom: var(--e-5);
+    max-width: 18ch;
+  }
+
+  /* ---------- Niveaux ---------- */
+  .niveaux {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 2px solid var(--bleu);
+  }
+
+  .niveau {
+    display: grid;
+    grid-template-columns: minmax(0, 1.3fr) 9rem minmax(0, 2fr) auto;
+    gap: var(--e-4);
+    align-items: baseline;
+    padding: var(--e-4) var(--e-2);
+    border-bottom: 1px solid var(--filet);
+    color: var(--encre);
+    text-decoration: none;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease;
+  }
+
+  .niveau-nom {
+    font-size: var(--taille-xl);
+    font-weight: 800;
+    font-stretch: 118%;
+    color: var(--bleu);
+    line-height: 1.1;
+    transition: color 0.2s ease;
+  }
+
+  .niveau-duree {
+    font-weight: 600;
+    color: var(--rouge);
+    font-size: var(--taille-s);
+  }
+
+  .niveau-texte {
+    color: var(--encre-douce);
+  }
+
+  .niveau-compte {
+    font-weight: 700;
+    color: var(--bleu);
+    white-space: nowrap;
+  }
+
+  .niveau:hover {
+    background: var(--bleu);
+    color: #fff;
+  }
+
+  .niveau:hover :is(.niveau-nom, .niveau-texte, .niveau-compte) {
+    color: #fff;
+  }
+
+  .niveau:hover .niveau-duree {
+    color: #ff9c9c;
+  }
+
+  /* ---------- Bandeau défilant ---------- */
+  .defilant {
+    overflow: hidden;
+    background: var(--rouge);
+  }
+
+  .defilant-piste {
+    display: flex;
+    width: max-content;
+  }
+
+  :global(.anim) .defilant-piste {
+    animation: defiler 80s linear infinite;
+  }
+
+  .defilant:hover .defilant-piste,
+  .defilant:focus-within .defilant-piste {
+    animation-play-state: paused;
+  }
+
+  @keyframes defiler {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  .defilant-liste {
+    display: flex;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .defilant-liste a {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 1.1rem 1.6rem;
+    color: #fff;
+    font-weight: 700;
+    font-stretch: 112%;
+    white-space: nowrap;
+    text-decoration: none;
+  }
+
+  .defilant-liste a:hover {
+    text-decoration: underline;
+    color: #fff;
+  }
+
+  .defilant-niveau {
+    padding: 0.1rem 0.5rem;
+    border-radius: 999px;
+    background: var(--bleu);
+    font-size: var(--taille-xs);
+    font-stretch: 100%;
+  }
+
+  :global(html:not(.anim)) .defilant {
+    overflow-x: auto;
+  }
+
+  :global(html:not(.anim)) .defilant-liste[aria-hidden='true'] {
+    display: none;
+  }
+
+  /* ---------- Instituts ---------- */
+  .instituts {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--e-5);
+  }
+
+  .institut {
+    display: grid;
+    align-content: start;
+    gap: var(--e-1);
+    color: var(--encre);
+    text-decoration: none;
+  }
+
+  .institut-arche {
+    aspect-ratio: 5 / 4;
+    margin-bottom: var(--e-2);
+  }
+
+  .institut-sigle {
+    font-weight: 800;
+    font-stretch: 118%;
+    font-size: var(--taille-l);
+    color: var(--rouge);
+  }
+
+  .institut h3 {
+    font-size: var(--taille-xl);
+    transition: color 0.2s ease;
+  }
+
+  .institut-texte {
+    color: var(--encre-douce);
+    max-width: 34rem;
+  }
+
+  .institut:hover h3 {
+    color: var(--rouge);
+  }
+
+  .cfcp {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: var(--e-4);
+    align-items: center;
+    margin-top: var(--e-5);
+    padding: var(--e-3) var(--e-4);
+    background: var(--bleu);
+    color: rgb(255 255 255 / 0.85);
+    border-radius: var(--rayon);
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+  }
+
+  .cfcp:hover {
+    background: #121f52;
+    color: rgb(255 255 255 / 0.85);
+  }
+
+  .cfcp-sigle {
+    font-size: var(--taille-xl);
+    font-weight: 800;
+    font-stretch: 118%;
+    color: #fff;
+  }
+
+  .cfcp strong {
+    color: #fff;
+  }
+
+  .cfcp-lien {
+    font-weight: 700;
+    color: #fff;
+    text-decoration: underline;
+    text-underline-offset: 0.25em;
+  }
+
+  /* ---------- Atouts ---------- */
+  .atouts-grille {
+    display: grid;
+    grid-template-columns: 0.8fr 1.2fr;
+    gap: var(--e-6);
+    align-items: center;
+  }
+
+  .atouts-arche {
+    aspect-ratio: 4 / 5;
+  }
+
+  .atouts-intro {
+    margin-top: calc(var(--e-5) * -0.6);
+    margin-bottom: var(--e-4);
+    max-width: 38rem;
+    color: var(--encre-douce);
+    font-size: var(--taille-l);
+  }
+
+  .atouts {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--e-4) var(--e-5);
+    margin: 0;
+  }
+
+  .atouts div {
+    padding-top: var(--e-2);
+    border-top: 2px solid var(--bleu);
+  }
+
+  .atouts dt {
+    font-weight: 800;
+    font-stretch: 108%;
+    color: var(--bleu);
+    margin-bottom: 0.35rem;
+  }
+
+  .atouts dd {
+    margin: 0;
+    color: var(--encre-douce);
+    font-size: var(--taille-s);
+  }
+
+  /* ---------- Président ---------- */
+  .president {
+    background: var(--fond-doux);
+    padding-block: var(--e-6);
+  }
+
+  .president-grille {
+    display: grid;
+    gap: var(--e-4);
+    justify-items: start;
+  }
+
+  .president figure {
+    margin: 0;
+    display: grid;
+    gap: var(--e-4);
+  }
+
+  .president blockquote {
+    margin: 0;
+    max-width: 52rem;
+  }
+
+  .president blockquote p {
+    font-size: clamp(1.4rem, 1rem + 1.6vw, 2.25rem);
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--bleu);
+    text-wrap: pretty;
+  }
+
+  .president blockquote p::before {
+    content: '« ';
+    color: var(--rouge);
+  }
+
+  .president blockquote p::after {
+    content: ' »';
+    color: var(--rouge);
+  }
+
+  .president figcaption {
+    display: flex;
+    align-items: center;
+    gap: var(--e-2);
+    color: var(--encre-douce);
+  }
+
+  .president figcaption > span:last-child {
+    display: grid;
+  }
+
+  .president figcaption strong {
+    color: var(--bleu);
+    font-size: var(--taille-l);
+  }
+
+  .president-portrait {
+    display: block;
+    width: 4.5rem;
+    aspect-ratio: 4 / 5;
+    flex: none;
+  }
+
+  .lien-discret {
+    font-weight: 700;
+    text-underline-offset: 0.25em;
+  }
+
+  /* ---------- Vie étudiante ---------- */
+  .vie-entete {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--e-5);
+    align-items: end;
+    margin-bottom: var(--e-5);
+  }
+
+  .vie-entete .titre-section {
+    margin-bottom: 0;
+  }
+
+  .vie-entete p {
+    color: var(--encre-douce);
+    font-size: var(--taille-l);
+  }
+
+  .vie-galerie {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr 1fr;
+    gap: var(--e-3);
+    align-items: end;
+    margin-bottom: var(--e-4);
+  }
+
+  .vie-1 {
+    aspect-ratio: 4 / 5;
+  }
+
+  .vie-2 {
+    aspect-ratio: 3 / 4;
+  }
+
+  .vie-3 {
+    aspect-ratio: 2 / 3;
+  }
+
+  /* ---------- Appel ---------- */
+  .appel {
+    background: var(--bleu);
+    color: #fff;
+    padding-block: var(--e-6);
+    border-top: 6px solid var(--rouge);
+  }
+
+  .appel-int {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    justify-content: space-between;
+    gap: var(--e-4);
+  }
+
+  .appel h2 {
+    color: #fff;
+    max-width: 16ch;
+  }
+
+  .appel .actions {
+    margin-top: 0;
+  }
+
+  .bouton-blanc {
+    background: #fff;
+    color: var(--bleu);
+  }
+
+  .bouton-blanc:hover {
+    background: var(--rouge);
+    color: #fff;
+  }
+
+  .bouton-contour-blanc {
+    color: #fff;
+    border-color: rgb(255 255 255 / 0.5);
+  }
+
+  .bouton-contour-blanc:hover {
+    border-color: #fff;
+    color: #fff;
+    background: rgb(255 255 255 / 0.08);
+  }
+
+  /* ---------- Adaptation ---------- */
+  @media (max-width: 960px) {
+    .ouverture-grille {
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+
+    .ouverture-texte {
+      padding-bottom: var(--e-5);
+    }
+
+    .ouverture-visuel {
+      width: min(100%, 24rem);
+      justify-self: center;
+    }
+
+    .niveau {
+      grid-template-columns: 1fr auto;
+      gap: var(--e-1) var(--e-3);
+    }
+
+    .niveau-texte {
+      grid-column: 1 / -1;
+    }
+
+    .niveau-compte {
+      grid-column: 2;
+      grid-row: 1;
+    }
+
+    .niveau-duree {
+      grid-column: 1;
+    }
+
+    .instituts,
+    .atouts-grille,
+    .vie-entete {
+      grid-template-columns: 1fr;
+      gap: var(--e-4);
+    }
+
+    .atouts-arche {
+      width: min(100%, 22rem);
+    }
+
+    .cfcp {
+      grid-template-columns: 1fr;
+      gap: var(--e-1);
+    }
+  }
+
+  @media (max-width: 600px) {
+    .atouts {
+      grid-template-columns: 1fr;
+    }
+
+    .vie-galerie {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .vie-1 {
+      grid-column: 1 / -1;
+      aspect-ratio: 4 / 3;
+    }
+  }
+</style>

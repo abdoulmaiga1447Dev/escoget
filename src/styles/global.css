@@ -1,0 +1,543 @@
+/*
+ * Université ESCOGET — styles globaux.
+ * Couleurs : charte graphique 2024 (RVB écran) — bleu 9/20/59, rouge 191/0/1.
+ * Police : Archivo, utilisée pour les textes de la charte.
+ */
+
+:root {
+  /* Couleurs de la charte */
+  --bleu: #09143b;
+  --rouge: #bf0001;
+
+  /* Neutres teintés vers le bleu de la charte */
+  --encre: #141c33;          /* texte courant */
+  --encre-douce: #525b70;    /* texte secondaire */
+  --filet: #dce1ea;          /* bordures, séparateurs */
+  --fond: #ffffff;
+  --fond-doux: #f3f5f9;      /* sections alternées */
+  --bleu-clair: #e7ebf4;     /* fonds teintés derrière du texte bleu */
+  --rouge-clair: #fbe9e9;
+
+  /* Typographie */
+  --police: "Archivo Variable", "Archivo", "Segoe UI", system-ui, sans-serif;
+  --taille-xs: 0.8125rem;   /* 13px */
+  --taille-s: 0.9375rem;    /* 15px */
+  --taille-m: 1.0625rem;    /* 17px, texte courant */
+  --taille-l: 1.25rem;      /* 20px */
+  --taille-xl: clamp(1.5rem, 1.2rem + 1.2vw, 2rem);
+  --taille-2xl: clamp(1.875rem, 1.4rem + 2vw, 2.75rem);
+  --taille-3xl: clamp(2.25rem, 1.5rem + 3.4vw, 3.75rem);
+
+  /* Espacements */
+  --e-1: 0.5rem;
+  --e-2: 1rem;
+  --e-3: 1.5rem;
+  --e-4: 2rem;
+  --e-5: 3rem;
+  --e-6: 4.5rem;
+  --e-7: 6rem;
+
+  /* Formes */
+  --rayon: 6px;
+  --largeur: 72rem;
+  --gouttiere: max(1rem, env(safe-area-inset-left, 0px));
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent; /* pas de flash gris au toucher */
+  scroll-behavior: smooth;
+}
+
+/* Animations réduites : on garde les fondus, on retire les mouvements (voir « Animations » plus bas). */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* Toucher immédiat sur téléphone, sans délai de double-tap */
+a,
+button,
+summary,
+label {
+  touch-action: manipulation;
+}
+
+body {
+  margin: 0;
+  font-family: var(--police);
+  font-size: var(--taille-m);
+  line-height: 1.6;
+  color: var(--encre);
+  background: var(--fond);
+  font-variant-numeric: lining-nums;
+}
+
+/* Les éléments qui glissent depuis le côté avant d'apparaître ne doivent pas
+   élargir la page. « clip » (et non « hidden ») garde les éléments « sticky » fonctionnels. */
+main {
+  overflow-x: clip;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  margin: 0;
+  line-height: 1.15;
+  color: var(--bleu);
+  font-weight: 700;
+  font-stretch: 100%;
+  text-wrap: balance;
+}
+
+/* Titres : Archivo élargi et très gras, en écho aux lettres larges d'« ESCOGET » dans le logo.
+   Le texte courant reste en largeur normale : une seule famille, deux voix bien distinctes. */
+h1,
+h2 {
+  font-weight: 800;
+  font-stretch: 118%;
+  line-height: 1.04;
+}
+
+h1 {
+  font-size: var(--taille-3xl);
+  letter-spacing: -0.025em;
+}
+
+h2 {
+  font-size: var(--taille-2xl);
+  letter-spacing: -0.02em;
+}
+
+h3 {
+  font-stretch: 108%;
+}
+
+h3 {
+  font-size: var(--taille-l);
+}
+
+p {
+  margin: 0;
+}
+
+a {
+  color: var(--bleu);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+a:hover {
+  color: var(--rouge);
+}
+
+:focus-visible {
+  outline: 3px solid var(--rouge);
+  outline-offset: 2px;
+}
+
+.conteneur {
+  width: 100%;
+  max-width: var(--largeur);
+  margin-inline: auto;
+  padding-left: max(1.25rem, env(safe-area-inset-left, 0px));
+  padding-right: max(1.25rem, env(safe-area-inset-right, 0px));
+}
+
+.visuellement-cache {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.lien-evitement {
+  position: absolute;
+  left: 1rem;
+  top: -4rem;
+  z-index: 100;
+  padding: 0.75rem 1rem;
+  background: var(--bleu);
+  color: #fff;
+  border-radius: var(--rayon);
+}
+
+.lien-evitement:focus {
+  top: 1rem;
+  color: #fff;
+}
+
+/* Sur-titre : petite étiquette au-dessus d'un titre de section */
+/* Sur-titre : gardé seulement là où il situe la page (bandeaux), en minuscules et sans fioriture */
+.surtitre {
+  font-size: var(--taille-s);
+  font-weight: 600;
+  color: var(--rouge);
+}
+
+/* ---------- L'arche : motif signature ----------
+   L'arc du logo devient la forme des photos, comme les arcades d'un bâtiment universitaire. */
+.arche {
+  position: relative;
+  overflow: hidden;
+  border-radius: 999px 999px var(--rayon) var(--rayon);
+  isolation: isolate;
+}
+
+.arche :is(.image, .emplacement) {
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+}
+
+/* Profondeur au défilement : la photo glisse un peu plus lentement que la page.
+   Animation pilotée par le défilement, seulement là où le navigateur la gère. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .arche .image {
+      scale: 1.14;
+      animation: profondeur linear both;
+      animation-timeline: view();
+      animation-range: cover;
+    }
+  }
+}
+
+@keyframes profondeur {
+  from {
+    translate: 0 -5%;
+  }
+  to {
+    translate: 0 5%;
+  }
+}
+
+/* Boutons */
+.bouton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 3rem;
+  padding: 0.75rem 1.4rem;
+  border: 2px solid transparent;
+  border-radius: var(--rayon);
+  font: inherit;
+  font-weight: 650;
+  font-size: var(--taille-s);
+  text-decoration: none;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease,
+    scale 0.16s var(--ease-out);
+}
+
+/* Retour immédiat à l'appui */
+.bouton:active {
+  scale: 0.97;
+}
+
+.bouton-principal {
+  background: var(--rouge);
+  color: #fff;
+}
+
+.bouton-principal:hover {
+  background: #9c0001;
+  color: #fff;
+}
+
+.bouton-secondaire {
+  border-color: currentColor;
+  color: var(--bleu);
+  background: transparent;
+}
+
+.bouton-secondaire:hover {
+  background: var(--bleu);
+  border-color: var(--bleu);
+  color: #fff;
+}
+
+.sur-fonce .bouton-secondaire {
+  color: #fff;
+}
+
+.sur-fonce .bouton-secondaire:hover {
+  background: #fff;
+  border-color: #fff;
+  color: var(--bleu);
+}
+
+.section {
+  padding-block: var(--e-6);
+}
+
+.section-douce {
+  background: var(--fond-doux);
+}
+
+.entete-section {
+  display: grid;
+  gap: var(--e-2);
+  max-width: 44rem;
+  margin-bottom: var(--e-5);
+}
+
+.entete-section p {
+  color: var(--encre-douce);
+  font-size: var(--taille-m);
+}
+
+/* ---------- Formulaires ---------- */
+.formulaire {
+  display: grid;
+  gap: var(--e-3);
+}
+
+.champs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--e-3);
+}
+
+.champ {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.champ-large {
+  grid-column: 1 / -1;
+}
+
+.champ label {
+  font-weight: 650;
+  font-size: var(--taille-s);
+  color: var(--bleu);
+}
+
+.champ .aide {
+  font-size: var(--taille-xs);
+  color: var(--encre-douce);
+}
+
+.champ input,
+.champ select,
+.champ textarea {
+  width: 100%;
+  min-height: 3rem;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid #b8c0cf;
+  border-radius: var(--rayon);
+  background: #fff;
+  color: var(--encre);
+  font: inherit;
+  font-size: var(--taille-m);
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+
+.champ textarea {
+  min-height: 8rem;
+  resize: vertical;
+}
+
+.champ input:focus,
+.champ select:focus,
+.champ textarea:focus {
+  outline: none;
+  border-color: var(--bleu);
+  box-shadow: 0 0 0 3px rgb(9 20 59 / 0.15);
+}
+
+.champ input:user-invalid,
+.champ select:user-invalid,
+.champ textarea:user-invalid {
+  border-color: var(--rouge);
+}
+
+.obligatoire {
+  color: var(--rouge);
+}
+
+.message-formulaire {
+  padding: var(--e-2) var(--e-3);
+  border-radius: var(--rayon);
+  border-left: 4px solid var(--bleu);
+  background: var(--bleu-clair);
+  color: var(--bleu);
+  font-weight: 600;
+}
+
+@media (max-width: 640px) {
+  .champs {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- Animations ----------
+ * Principes : entrées courtes et franches, survols discrets, rien de masqué sans JavaScript.
+ * - <html class="anim"> : animations complètes (posée par BaseLayout si JavaScript tourne).
+ * - <html class="anim-reduit"> : l'utilisateur a demandé moins d'animations → fondus seuls, sans mouvement.
+ * - Sans l'une de ces classes, rien n'est masqué : le contenu reste visible.
+ * Les entrées utilisent des keyframes (jouées une fois), les survols des transitions courtes.
+ */
+:root {
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1); /* entrées et sorties */
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1); /* mouvements à l'écran, tracés */
+  --courbe: var(--ease-out);
+}
+
+@keyframes monter {
+  from {
+    opacity: 0;
+    transform: translateY(var(--distance, 12px));
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes fondu {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes devoiler {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes apparaitre-image {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes tracer {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Apparitions au défilement. Le délai est calculé par animations.ts (décalage non uniforme). */
+.anim [data-revele],
+.anim-reduit [data-revele] {
+  opacity: 0;
+}
+
+.anim [data-revele].visible {
+  animation: monter 0.5s var(--ease-out) both;
+}
+
+/* Les images se dévoilent de bas en haut. La découpe porte sur le contenu, pas sur l'élément
+   observé : un élément entièrement découpé n'est jamais considéré comme visible par le navigateur. */
+.anim [data-revele='zoom'] {
+  opacity: 1;
+}
+
+.anim [data-revele='zoom'] > * {
+  clip-path: inset(0 0 100% 0);
+}
+
+.anim [data-revele='zoom'].visible {
+  animation: none;
+}
+
+.anim [data-revele='zoom'].visible > * {
+  animation: devoiler 0.7s var(--ease-in-out) both;
+  animation-delay: inherit;
+}
+
+/* Entrée des bandeaux de page : rôles « principal / secondaire » (montée) et « décor » (fondu seul) */
+.anim .entree {
+  --distance: 16px;
+  animation: monter 0.6s var(--ease-out) both;
+  animation-delay: var(--delai, 0s);
+}
+
+.anim .entree-fondu {
+  animation: fondu 0.4s ease both;
+  animation-delay: var(--delai, 0s);
+}
+
+.anim .entree-image {
+  animation: apparaitre-image 0.6s var(--ease-out) 0.12s both;
+}
+
+/* Animations réduites : tout apparaît ensemble, en fondu, sans déplacement */
+.anim-reduit [data-revele].visible,
+.anim-reduit .entree,
+.anim-reduit .entree-fondu,
+.anim-reduit .entree-image {
+  animation: fondu 0.25s ease both;
+}
+
+.anim-reduit [data-revele='zoom'] {
+  opacity: 1;
+}
+
+/* Flèche des liens qui avance au survol */
+.fleche {
+  display: inline-block;
+  transition: transform 0.2s ease;
+}
+
+a:focus-visible .fleche {
+  transform: translateX(4px);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  a:hover .fleche {
+    transform: translateX(4px);
+  }
+}
+
+/* Sur écran tactile, un « survol » reste collé après le toucher : on neutralise les
+   déplacements et zooms de survol. Les changements de couleur restent. */
+@media (hover: none), (pointer: coarse) {
+  :hover:not(.image) {
+    translate: none !important;
+  }
+
+  :hover .image,
+  :hover .fleche {
+    transform: none !important;
+  }
+}
