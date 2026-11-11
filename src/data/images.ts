@@ -11,6 +11,7 @@ export const textesAlternatifs: Record<string, string> = {
   'ACC-03': 'Étudiants au travail dans une salle informatique',
   'ACC-04': 'Participants assistant à une conférence dans une salle de l’Université',
   'ACC-05': 'Étudiant en gilet de sécurité travaillant sur un ordinateur portable',
+  'ACC-06': 'Portrait du Dr ELETE AKA, Président de l’Université ESCOGET',
   'ACC-07': 'Remise de diplôme : une diplômée en toge entourée d’officiels devant la bannière ESCOGET',
   'ACC-08': 'Journées culturelles : étudiants en tenues traditionnelles lors d’un défilé',
   'ACC-09': 'Étudiants concentrés pendant une épreuve en salle de cours',
