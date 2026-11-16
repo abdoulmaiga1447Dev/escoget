@@ -1,46 +1,50 @@
 ---
-/** Page d'un institut qui délivre des diplômes (IHECG, IHET) : présentation et formations rattachées. */
-import BaseLayout from '../layouts/BaseLayout.astro';
-import EntetePage from './EntetePage.astro';
-import CarteFormation from './CarteFormation.astro';
-import { etablissement } from '../data/etablissement';
-import { formations, niveaux, type Niveau } from '../data/formations';
+/** Page d'une UFR : présentation et formations rattachées. */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import EntetePage from '../../components/EntetePage.astro';
+import CarteFormation from '../../components/CarteFormation.astro';
+import { etablissement } from '../../data/etablissement';
+import { formations, niveaux, domaines, ordreDomaines, type Domaine, type Niveau } from '../../data/formations';
 
-interface Props {
-  sigle: 'IHECG' | 'IHET';
-  image: { id: string; sujet: string };
+export function getStaticPaths() {
+  return ordreDomaines.map((domaine) => ({ params: { slug: domaines[domaine].slug }, props: { domaine } }));
 }
 
-const { sigle, image } = Astro.props;
-const inst = etablissement.instituts.find((i) => i.sigle === sigle)!;
-const liste = formations.filter((f) => f.institut === sigle);
+const { domaine } = Astro.props as { domaine: Domaine };
+const ufr = etablissement.ufr.find((u) => u.domaine === domaine)!;
+const nom = domaines[domaine].ufr;
+const liste = formations.filter((f) => f.domaine === domaine);
 const ordre: Niveau[] = ['BTS', 'Licence', 'Master'];
 ---
 
-<BaseLayout titre={`${inst.sigle} · ${inst.nom}`} description={`${inst.nom} (${inst.sigle}), institut de l’Université ESCOGET : ${inst.texte}`}>
+<BaseLayout titre={nom} description={`${nom}, Université ESCOGET : ${ufr.texte}`}>
   <EntetePage
-    titre={inst.nom}
-    surtitre={`${inst.sigle} · depuis ${inst.depuis}`}
-    intro={inst.texte}
-    ariane={[{ libelle: 'Instituts', lien: '/instituts' }, { libelle: inst.sigle }]}
-    image={image}
+    titre={nom}
+    surtitre="UFR"
+    intro={ufr.texte}
+    ariane={[{ libelle: 'UFR', lien: '/ufr' }, { libelle: domaines[domaine].libelle }]}
+    image={ufr.image}
   />
 
   <section class="section">
     <div class="conteneur presentation">
-      <ul class="points">
-        {
-          inst.pointsForts.map((p) => (
-            <li data-revele>
-              {p}
-            </li>
-          ))
-        }
-      </ul>
-      <aside class="responsable" data-revele="droite">
-        <p class="surtitre">Direction pédagogique</p>
-        <p><strong>{inst.responsable.nom}</strong>{inst.responsable.fonction} de l’{inst.sigle}</p>
-        <a class="bouton bouton-secondaire" href="/contact">Contacter l’institut</a>
+      {
+        ufr.pointsForts.length > 0 ? (
+          <ul class="points">
+            {ufr.pointsForts.map((p) => (
+              <li data-revele>{p}</li>
+            ))}
+          </ul>
+        ) : (
+          <p class="resume" data-revele>
+            {liste.length} formations, de la Licence au Master, pour se préparer aux métiers du droit, de l’administration et de la fiscalité.
+          </p>
+        )
+      }
+      <aside class="contact" data-revele>
+        <p><strong>Une question sur les formations de l’UFR ?</strong></p>
+        <p>Notre service de scolarité vous répond et vous oriente.</p>
+        <a class="bouton bouton-secondaire" href="/contact">Nous contacter</a>
       </aside>
     </div>
   </section>
@@ -48,7 +52,7 @@ const ordre: Niveau[] = ['BTS', 'Licence', 'Master'];
   <section class="section section-douce">
     <div class="conteneur">
       <div class="entete-section" data-revele>
-        <h2>{liste.length} formations à l’{inst.sigle}</h2>
+        <h2>{liste.length} formations</h2>
       </div>
       {
         ordre.map((n) => {
@@ -89,9 +93,6 @@ const ordre: Niveau[] = ['BTS', 'Licence', 'Master'];
   }
 
   .points li {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    gap: var(--e-3);
     padding: var(--e-3) 0;
     border-bottom: 1px solid var(--filet);
     font-size: var(--taille-l);
@@ -99,12 +100,14 @@ const ordre: Niveau[] = ['BTS', 'Licence', 'Master'];
     color: var(--bleu);
   }
 
-  .num {
-    color: var(--rouge);
-    font-weight: 750;
+  .resume {
+    font-size: var(--taille-l);
+    font-weight: 600;
+    color: var(--bleu);
+    max-width: 40rem;
   }
 
-  .responsable {
+  .contact {
     display: grid;
     gap: var(--e-2);
     justify-items: start;
@@ -112,14 +115,10 @@ const ordre: Niveau[] = ['BTS', 'Licence', 'Master'];
     border-radius: var(--rayon);
     background: var(--fond-doux);
     border-top: 4px solid var(--rouge);
-  }
-
-  .responsable p:not(.surtitre) {
-    display: grid;
     color: var(--encre-douce);
   }
 
-  .responsable strong {
+  .contact strong {
     color: var(--bleu);
     font-size: var(--taille-l);
   }

@@ -13,14 +13,12 @@ const { formation: f } = Astro.props;
   href={`/formations/${f.slug}`}
   data-niveau={f.niveau}
   data-domaine={f.domaine}
-  data-institut={f.institut ?? 'aucun'}
   data-recherche={`${f.intitule} ${f.sigle ?? ''} ${f.niveau}`.toLowerCase()}
 >
   <span class:list={['niveau', `niveau-${f.niveau.toLowerCase()}`]}>{niveaux[f.niveau].libelle}</span>
   <h3>{f.intitule}</h3>
   <p class="meta">
     {niveaux[f.niveau].duree}
-    {f.institut && <> · {f.institut}</>}
   </p>
   <p class="domaine">{domaines[f.domaine].libelle}</p>
   <span class="suite">

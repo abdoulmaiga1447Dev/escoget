@@ -1,0 +1,124 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import EntetePage from '../../components/EntetePage.astro';
+import ImageSlot from '../../components/ImageSlot.astro';
+import { etablissement } from '../../data/etablissement';
+import { formations, domaines, niveaux, type Niveau } from '../../data/formations';
+
+const resume = (domaine: string) => {
+  const liste = formations.filter((f) => f.domaine === domaine);
+  return (['BTS', 'Licence', 'Master'] as Niveau[])
+    .map((n) => [n, liste.filter((f) => f.niveau === n).length] as const)
+    .filter(([, nb]) => nb > 0)
+    .map(([n, nb]) => `${nb} ${nb > 1 ? niveaux[n].libelle.replace(/(\w+) (\w+)/, '$1s $2s') : niveaux[n].libelle}`)
+    .join(', ');
+};
+---
+
+<BaseLayout
+  titre="Nos UFR"
+  description="Les trois UFR de l’Université ESCOGET : science économique et gestion ; droit, science administrative et politique ; science et technologie."
+>
+  <EntetePage
+    titre="Trois UFR, du BTS au Master"
+    surtitre="Nos UFR"
+    intro="L’Université ESCOGET organise ses formations en trois unités de formation et de recherche (UFR), chacune consacrée à un grand domaine."
+    ariane={[{ libelle: 'UFR' }]}
+  />
+
+  <section class="section">
+    <div class="conteneur liste">
+      {
+        etablissement.ufr.map((u, i) => (
+          <a class:list={['ufr', { inverse: i % 2 === 1 }]} href={`/ufr/${domaines[u.domaine].slug}`} data-revele>
+            <div class="arche cadre-image">
+              <ImageSlot id={u.image.id} format="paysage" sujet={u.image.sujet} />
+            </div>
+            <div class="texte">
+              <h2>{domaines[u.domaine].ufr}</h2>
+              <p>{u.texte}</p>
+              <p class="compte">{resume(u.domaine)}</p>
+              <span class="suite">Voir les formations</span>
+            </div>
+          </a>
+        ))
+      }
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .liste {
+    display: grid;
+    gap: var(--e-6);
+  }
+
+  .ufr {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--e-5);
+    align-items: center;
+    color: var(--encre);
+    text-decoration: none;
+  }
+
+  .ufr.inverse .cadre-image {
+    order: 2;
+  }
+
+  .cadre-image {
+    overflow: hidden;
+  }
+
+  .cadre-image :global(.image),
+  .cadre-image :global(.emplacement) {
+    border-radius: 0;
+    transition: transform 0.4s ease;
+  }
+
+  .ufr:hover :global(.image) {
+    transform: scale(1.03);
+  }
+
+  .texte {
+    display: grid;
+    gap: var(--e-2);
+  }
+
+  .texte h2 {
+    font-size: var(--taille-xl);
+    transition: color 0.2s ease;
+  }
+
+  .texte p:not(.compte) {
+    color: var(--encre-douce);
+  }
+
+  .compte {
+    font-weight: 650;
+    color: var(--bleu);
+  }
+
+  .suite {
+    font-weight: 700;
+    color: var(--bleu);
+    text-decoration: underline;
+    text-underline-offset: 0.25em;
+  }
+
+  .ufr:hover h2,
+  .ufr:hover .suite {
+    color: var(--rouge);
+  }
+
+  @media (max-width: 860px) {
+    .ufr {
+      grid-template-columns: 1fr;
+      gap: var(--e-3);
+    }
+
+    .ufr.inverse .cadre-image {
+      order: 0;
+    }
+  }
+</style>

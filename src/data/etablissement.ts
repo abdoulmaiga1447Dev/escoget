@@ -74,8 +74,8 @@ export const etablissement = {
   direction: [
     { nom: 'Dr ELETE AKA', fonction: 'Président' }, // A_CONFIRMER : titre exact
     { nom: 'Pr ASSANDE Adom', fonction: 'Directeur académique, président du Conseil pédagogique et scientifique' }, // A_CONFIRMER : grade
-    { nom: 'M. KADJA Alain', fonction: 'Directeur pédagogique de l’IHECG' },
-    { nom: 'M. KOPOIN Kopoin Appolinaire', fonction: 'Directeur pédagogique de l’IHET' },
+    { nom: 'M. KADJA Alain', fonction: 'Directeur pédagogique des filières tertiaires' },
+    { nom: 'M. KOPOIN Kopoin Appolinaire', fonction: 'Directeur pédagogique des filières industrielles et technologiques' },
     { nom: 'M. ELLO Vangah', fonction: 'Directeur administratif et financier' },
     { nom: 'M. OCHOU Marius Pacôme', fonction: 'Directeur du CFCP' },
   ],
@@ -97,50 +97,53 @@ export const etablissement = {
     { annee: '2024', texte: 'L’établissement adopte l’identité Université ESCOGET.' }, // A_CONFIRMER : date du passage en université
   ],
 
-  instituts: [
+  // Les trois UFR (voir domaines dans formations.ts). Textes à compléter quand l'Université précisera ses UFR.
+  ufr: [
     {
-      sigle: 'IHECG',
-      nom: 'Institut des Hautes Études Commerciales et de Gestion',
-      depuis: 1986,
+      domaine: 'gestion',
+      image: { id: 'ACC-02', sujet: 'Cours de gestion : étudiants en salle, enseignant au tableau' },
       texte:
-        'Forme des techniciens supérieurs, cadres et dirigeants aux métiers du commerce, du management, du marketing, de la communication, de la comptabilité, de la finance, des ressources humaines et de l’entrepreneuriat.',
-      lien: '/instituts/ihecg',
-      responsable: { nom: 'M. KADJA Alain', fonction: 'Directeur pédagogique' },
+        'Forme des techniciens supérieurs, cadres et dirigeants aux métiers de l’économie, du commerce, du management, du marketing, de la communication, de la comptabilité, de la finance, des ressources humaines et de l’entrepreneuriat.',
       pointsForts: [
-        'Le premier institut de l’établissement, à l’origine de l’ESVM en 1986',
-        'Des cas d’entreprise, des jeux de rôles et des stages à chaque année',
+        'Héritière de l’École Supérieure de Vente, de Marketing et de Management, fondée en 1986',
+        'Des cas d’entreprise, des jeux de rôles et des stages chaque année',
         'Un centre de recherche en marketing et entrepreneuriat (CREME)',
       ],
     },
     {
-      sigle: 'IHET',
-      nom: 'Institut des Hautes Études Technologiques',
-      depuis: 2012,
+      domaine: 'droit',
+      image: { id: 'ACC-04', sujet: 'Étudiants assistant à une conférence' },
+      texte:
+        'Forme aux métiers du droit et de l’administration : droit privé et droit public en Licence ; droit des affaires et fiscalité, droit international et humanitaire, droit maritime et portuaire, droit bancaire en Master.',
+      pointsForts: [] as string[],
+    },
+    {
+      domaine: 'technologie',
+      image: { id: 'ACC-03', sujet: 'Travaux pratiques en salle informatique' },
       texte:
         'Forme des techniciens supérieurs, cadres et dirigeants dans les filières technologiques et industrielles : informatique, réseaux et télécoms, électrotechnique, génie civil, environnement.',
-      lien: '/instituts/ihet',
-      responsable: { nom: 'M. KOPOIN Kopoin Appolinaire', fonction: 'Directeur pédagogique' },
       pointsForts: [
         'Des salles spécialisées : télécommunications, bâtiment, électrotechnique, multimédia',
         'Deux salles informatiques d’environ soixante postes connectés',
         'Un centre de recherche en innovation technologique (CRIT)',
       ],
     },
-    {
-      sigle: 'CFCP',
-      nom: 'Cabinet de Formation, de Conseils et de Placement',
-      depuis: 1986,
-      texte:
-        'Formation continue des salariés (stages inter-entreprises et sur mesure), études et conseil aux entreprises, recrutement et placement des diplômés.',
-      lien: '/instituts/cfcp',
-      responsable: { nom: 'M. OCHOU Marius Pacôme', fonction: 'Directeur' },
-      pointsForts: [
-        'Agréé par le FNR depuis 1986 et par le FDFP depuis 1992',
-        'Des consultants de haut niveau, issus de plusieurs univers professionnels',
-        'Recrutement et placement des diplômés depuis 2012',
-      ],
-    },
-  ],
+  ] as const,
+
+  // Le CFCP n'est pas une UFR : il assure la formation continue et la relation avec les entreprises.
+  cfcp: {
+    sigle: 'CFCP',
+    nom: 'Cabinet de Formation, de Conseils et de Placement',
+    texte:
+      'Formation continue des salariés (stages inter-entreprises et sur mesure), études et conseil aux entreprises, recrutement et placement des diplômés.',
+    lien: '/formation-continue',
+    responsable: { nom: 'M. OCHOU Marius Pacôme', fonction: 'Directeur' },
+    pointsForts: [
+      'Agréé par le FNR depuis 1986 et par le FDFP depuis 1992',
+      'Des consultants de haut niveau, issus de plusieurs univers professionnels',
+      'Recrutement et placement des diplômés depuis 2012',
+    ],
+  },
 
   campus: [
     {

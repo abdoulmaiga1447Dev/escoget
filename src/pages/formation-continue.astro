@@ -1,9 +1,9 @@
 ---
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import EntetePage from '../../components/EntetePage.astro';
-import { etablissement } from '../../data/etablissement';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import EntetePage from '../components/EntetePage.astro';
+import { etablissement } from '../data/etablissement';
 
-const cfcp = etablissement.instituts.find((i) => i.sigle === 'CFCP')!;
+const cfcp = etablissement.cfcp;
 
 // Missions décrites dans les dossiers d'homologation (section CFCP).
 const missions = [
@@ -33,7 +33,7 @@ const missions = [
     titre={cfcp.nom}
     surtitre="CFCP · Formation continue et entreprises"
     intro="Le CFCP accompagne les entreprises et leurs salariés : formation continue, études et conseil, recrutement et placement des diplômés."
-    ariane={[{ libelle: 'Instituts', lien: '/instituts' }, { libelle: 'CFCP' }]}
+    ariane={[{ libelle: 'Formation continue' }]}
     image={{ id: 'ACC-04', sujet: 'Séminaire de formation professionnelle : adultes en tenue de bureau autour d’une table' }}
   >
     <div class="actions entree" style="--delai:0.18s">

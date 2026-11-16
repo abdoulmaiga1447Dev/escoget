@@ -4,7 +4,6 @@ import EntetePage from '../../components/EntetePage.astro';
 import CarteFormation from '../../components/CarteFormation.astro';
 import { formations, niveaux, domaines, type Formation } from '../../data/formations';
 import { fiches, reglesLicence, reglesMaster } from '../../data/fiches';
-import { etablissement } from '../../data/etablissement';
 
 export function getStaticPaths() {
   return formations.map((f) => ({ params: { slug: f.slug }, props: { formation: f } }));
@@ -14,7 +13,6 @@ const { formation: f } = Astro.props as { formation: Formation };
 const fiche = fiches[f.slug];
 const niveau = niveaux[f.niveau];
 const domaine = domaines[f.domaine];
-const institut = etablissement.instituts.find((i) => i.sigle === f.institut);
 
 const titre = `${niveau.libelle} ${f.intitule}`;
 const feminin = f.niveau === 'Licence';
@@ -43,8 +41,7 @@ const totalHeures = (heures: (number | undefined)[]) =>
     <ul class="faits entree" style="--delai:0.16s">
       <li><span>Durée</span>{niveau.duree}</li>
       <li><span>Accès</span>{niveau.acces}</li>
-      {institut && <li><span>Institut</span>{institut.sigle}</li>}
-      <li><span>Domaine</span>{domaine.libelle}</li>
+      <li><span>UFR</span>{domaine.libelle}</li>
     </ul>
     <div class="actions entree" style="--delai:0.2s">
       <a class="bouton bouton-principal" href={`/admissions?formation=${f.slug}#preinscription`}>
@@ -155,7 +152,7 @@ const totalHeures = (heures: (number | undefined)[]) =>
             <h2>À propos de cette formation</h2>
             <p>
               {article} {niveau.libelle} « {f.intitule} »
-              {institut ? ` est ${propose} par l’${institut.sigle}, ${institut.nom}. ` : ` est ${propose} par l’Université ESCOGET. `}
+              {` est ${propose} par l’Université ESCOGET. `}
               {releve} de l’{domaine.ufr}. Le programme détaillé de cette formation sera bientôt disponible sur le site. En attendant,
               notre service de scolarité vous le transmet sur simple demande.
             </p>

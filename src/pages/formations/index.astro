@@ -15,7 +15,7 @@ const listeDomaines = Object.entries(domaines) as [Domaine, { libelle: string }]
   <EntetePage
     titre="Nos formations"
     surtitre="Du BTS au Master"
-    intro={`${formations.length} formations professionnelles en économie et gestion, en droit et en sciences et technologies. Filtrez par niveau, par domaine ou par institut.`}
+    intro={`${formations.length} formations professionnelles en économie et gestion, en droit et en sciences et technologies. Filtrez par niveau ou par UFR.`}
     ariane={[{ libelle: 'Formations' }]}
   />
 
@@ -30,18 +30,10 @@ const listeDomaines = Object.entries(domaines) as [Domaine, { libelle: string }]
           </div>
         </fieldset>
         <div class="champ">
-          <label for="filtre-domaine">Domaine</label>
+          <label for="filtre-domaine">UFR</label>
           <select id="filtre-domaine" name="domaine">
-            <option value="">Tous les domaines</option>
+            <option value="">Toutes les UFR</option>
             {listeDomaines.map(([cle, d]) => <option value={cle}>{d.libelle}</option>)}
-          </select>
-        </div>
-        <div class="champ">
-          <label for="filtre-institut">Institut</label>
-          <select id="filtre-institut" name="institut">
-            <option value="">Tous les instituts</option>
-            <option value="IHECG">IHECG · Commerce et gestion</option>
-            <option value="IHET">IHET · Technologies</option>
           </select>
         </div>
         <div class="champ">
@@ -100,7 +92,6 @@ const listeDomaines = Object.entries(domaines) as [Domaine, { libelle: string }]
     const donnees = new FormData(formulaire);
     const niveau = String(donnees.get('niveau') ?? '');
     const domaine = String(donnees.get('domaine') ?? '');
-    const institut = String(donnees.get('institut') ?? '');
     const recherche = sansAccents(String(donnees.get('recherche') ?? '').trim());
 
     let total = 0;
@@ -109,7 +100,6 @@ const listeDomaines = Object.entries(domaines) as [Domaine, { libelle: string }]
       const ok =
         (!niveau || c.niveau === niveau) &&
         (!domaine || c.domaine === domaine) &&
-        (!institut || c.institut === institut) &&
         (!recherche || sansAccents(c.recherche ?? '').includes(recherche));
       li.hidden = !ok;
       if (ok) {
@@ -143,7 +133,7 @@ const listeDomaines = Object.entries(domaines) as [Domaine, { libelle: string }]
 
   .filtres {
     display: grid;
-    grid-template-columns: 1.6fr 1fr 1fr 1.2fr;
+    grid-template-columns: 1.6fr 1.2fr 1.2fr;
     gap: var(--e-3);
     align-items: end;
     padding: var(--e-3);
