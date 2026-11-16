@@ -1,0 +1,239 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import EntetePage from '../components/EntetePage.astro';
+import Temoignage from '../components/Temoignage.astro';
+import { temoignages, provisoire, initiales } from '../data/temoignages';
+import { etablissement as e } from '../data/etablissement';
+
+const [vedette, ...autres] = temoignages;
+const sujetMail = encodeURIComponent('Mon témoignage d’ancien étudiant');
+---
+
+<BaseLayout
+  titre="Témoignages"
+  description="Témoignages des anciens étudiants de l’Université ESCOGET : leur parcours, leur formation et ce qu’elle leur a apporté dans leur vie professionnelle."
+  noindex={provisoire}
+>
+  <EntetePage
+    titre="Ils ont étudié à l’ESCOGET"
+    surtitre="Témoignages"
+    intro="Diplômés en gestion, en droit ou en technologies, nos anciens racontent ce que leurs années à l’Université ESCOGET leur ont apporté."
+    ariane={[{ libelle: 'Témoignages' }]}
+    image={{ id: 'ACC-07', sujet: 'Remise de diplôme devant la bannière ESCOGET' }}
+  />
+
+  {
+    provisoire && (
+      <div class="bandeau-provisoire" role="note">
+        <p class="conteneur">
+          <strong>Page en préparation.</strong> Les témoignages ci-dessous sont des exemples. Ils seront remplacés par les
+          vrais témoignages de nos anciens étudiants.
+        </p>
+      </div>
+    )
+  }
+
+  <!-- Témoignage mis en avant -->
+  <section class="section vedette">
+    <div class="conteneur">
+      <figure class="vedette-grille">
+        <span class="arche vedette-portrait" data-revele="zoom">
+          {
+            vedette.photo ? (
+              <img class="image" src={`/images/temoignages/${vedette.photo}`} alt="" />
+            ) : (
+              <span class="vedette-initiales" aria-hidden="true">{initiales(vedette.nom)}</span>
+            )
+          }
+        </span>
+        <div class="vedette-texte">
+          {provisoire && <span class="exemple">Exemple</span>}
+          <blockquote data-revele>
+            <p>{vedette.texte}</p>
+          </blockquote>
+          <figcaption data-revele>
+            <strong>{vedette.nom}</strong>
+            <span>{vedette.formation} · promotion {vedette.promotion}</span>
+            <span>{vedette.poste}</span>
+          </figcaption>
+        </div>
+      </figure>
+    </div>
+  </section>
+
+  <!-- Les autres témoignages -->
+  <section class="section section-douce">
+    <div class="conteneur">
+      <div class="entete-section" data-revele>
+        <h2>Leurs parcours</h2>
+        <p>Des promotions et des formations différentes, un même point de départ : l’Université ESCOGET.</p>
+      </div>
+      <ul class="mur">
+        {
+          autres.map((t) => (
+            <li data-revele>
+              <Temoignage temoignage={t} exemple={provisoire} />
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- Appel aux anciens -->
+  <section class="section">
+    <div class="conteneur appel-anciens" data-revele>
+      <div>
+        <h2>Vous êtes un ancien de l’ESCOGET ?</h2>
+        <p>
+          Partagez votre parcours avec les futurs étudiants : envoyez-nous quelques lignes sur ce que l’Université vous a
+          apporté, votre formation, votre année de sortie, votre poste actuel et une photo de vous.
+        </p>
+      </div>
+      <a class="bouton bouton-principal" href={`mailto:${e.email}?subject=${sujetMail}`}>Envoyer mon témoignage</a>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .bandeau-provisoire {
+    background: #fff1e0;
+    color: #6b3a00;
+    font-size: var(--taille-s);
+    padding-block: var(--e-2);
+    border-bottom: 1px solid #f2d7b3;
+  }
+
+  /* ---------- Témoignage mis en avant ---------- */
+  .vedette-grille {
+    margin: 0;
+    display: grid;
+    grid-template-columns: minmax(12rem, 0.7fr) 2fr;
+    gap: var(--e-5);
+    align-items: center;
+  }
+
+  .vedette-portrait {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 4 / 5;
+    background: var(--bleu);
+  }
+
+  .vedette-initiales {
+    color: #fff;
+    font-size: clamp(3rem, 2rem + 4vw, 5.5rem);
+    font-weight: 800;
+    font-stretch: 118%;
+    padding-top: 15%;
+  }
+
+  .vedette-texte {
+    display: grid;
+    gap: var(--e-3);
+    justify-items: start;
+  }
+
+  .exemple {
+    padding: 0.1rem 0.55rem;
+    border-radius: 999px;
+    background: #fff1e0;
+    color: #8a4b00;
+    font-size: var(--taille-xs);
+    font-weight: 700;
+  }
+
+  .vedette blockquote {
+    margin: 0;
+  }
+
+  .vedette blockquote p {
+    font-size: clamp(1.35rem, 1rem + 1.4vw, 2.1rem);
+    font-weight: 600;
+    line-height: 1.32;
+    color: var(--bleu);
+    text-wrap: pretty;
+  }
+
+  .vedette blockquote p::before {
+    content: '« ';
+    color: var(--rouge);
+  }
+
+  .vedette blockquote p::after {
+    content: ' »';
+    color: var(--rouge);
+  }
+
+  .vedette figcaption {
+    display: grid;
+    gap: 0.15rem;
+    color: var(--encre-douce);
+  }
+
+  .vedette figcaption strong {
+    color: var(--bleu);
+    font-size: var(--taille-l);
+  }
+
+  /* ---------- Mur de témoignages ---------- */
+  .mur {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--e-3);
+  }
+
+  /* ---------- Appel aux anciens ---------- */
+  .appel-anciens {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: var(--e-4);
+    align-items: center;
+    padding: var(--e-5);
+    border-radius: var(--rayon);
+    border-top: 4px solid var(--rouge);
+    background: var(--fond-doux);
+  }
+
+  .appel-anciens h2 {
+    margin-bottom: var(--e-1);
+  }
+
+  .appel-anciens p {
+    color: var(--encre-douce);
+    max-width: 44rem;
+  }
+
+  @media (max-width: 960px) {
+    .mur {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 720px) {
+    .vedette-grille {
+      grid-template-columns: 1fr;
+      gap: var(--e-4);
+    }
+
+    .vedette-portrait {
+      width: min(14rem, 60%);
+    }
+
+    .mur {
+      grid-template-columns: 1fr;
+    }
+
+    .appel-anciens {
+      grid-template-columns: 1fr;
+      padding: var(--e-4) var(--e-3);
+    }
+
+    .appel-anciens .bouton {
+      justify-self: start;
+    }
+  }
+</style>

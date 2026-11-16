@@ -1,6 +1,6 @@
 ---
 import { etablissement } from '../data/etablissement';
-import { menu } from '../data/navigation';
+import { menu, liensSecondaires } from '../data/navigation';
 
 const annee = new Date().getFullYear();
 ---
@@ -41,7 +41,7 @@ const annee = new Date().getFullYear();
     <nav aria-label="Liens du pied de page">
       <h2 class="titre">Le site</h2>
       <ul class="liste">
-        {menu.map((item) => <li><a href={item.lien}>{item.libelle}</a></li>)}
+        {[...menu, ...liensSecondaires].map((item) => <li><a href={item.lien}>{item.libelle}</a></li>)}
       </ul>
     </nav>
   </div>

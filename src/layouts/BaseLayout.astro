@@ -7,10 +7,12 @@ import Footer from '../components/Footer.astro';
 interface Props {
   titre: string;
   description?: string;
+  noindex?: boolean; // page à ne pas référencer (contenu provisoire)
 }
 
 const {
   titre,
+  noindex = false,
   description = 'Université ESCOGET, établissement privé d’enseignement supérieur à Abidjan depuis 1986 : BTS, Licences et Masters professionnels en gestion, commerce, droit et technologies.',
 } = Astro.props;
 const titreComplet = titre === 'Accueil' ? 'Université ESCOGET · Abidjan' : `${titre} · Université ESCOGET`;
@@ -23,6 +25,7 @@ const titreComplet = titre === 'Accueil' ? 'Université ESCOGET · Abidjan' : `$
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>{titreComplet}</title>
     <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex" />}
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="theme-color" content="#09143b" />
     <script is:inline>

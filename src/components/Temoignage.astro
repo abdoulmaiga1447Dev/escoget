@@ -1,0 +1,124 @@
+---
+/** Carte d'un témoignage d'ancien étudiant : citation, photo (ou initiales), nom, parcours. */
+import { initiales, type Temoignage } from '../data/temoignages';
+
+interface Props {
+  temoignage: Temoignage;
+  exemple?: boolean;
+}
+
+const { temoignage: t, exemple = false } = Astro.props;
+---
+
+<figure class="temoignage">
+  {exemple && <span class="exemple">Exemple</span>}
+  <blockquote>
+    <p>{t.texte}</p>
+  </blockquote>
+  <figcaption>
+    <span class="arche portrait">
+      {t.photo ? <img src={`/images/temoignages/${t.photo}`} alt="" loading="lazy" /> : <span class="initiales" aria-hidden="true">{initiales(t.nom)}</span>}
+    </span>
+    <span class="identite">
+      <strong>{t.nom}</strong>
+      <span>{t.formation} · promotion {t.promotion}</span>
+      <span class="poste">{t.poste}</span>
+    </span>
+  </figcaption>
+</figure>
+
+<style>
+  .temoignage {
+    position: relative;
+    margin: 0;
+    display: grid;
+    grid-template-rows: 1fr auto;
+    gap: var(--e-3);
+    height: 100%;
+    padding: var(--e-4) var(--e-3) var(--e-3);
+    background: #fff;
+    border: 1px solid var(--filet);
+    border-radius: var(--rayon);
+  }
+
+  .temoignage::before {
+    content: '“';
+    position: absolute;
+    top: 0.1rem;
+    left: var(--e-3);
+    font-size: 4rem;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--rouge);
+  }
+
+  .exemple {
+    position: absolute;
+    top: var(--e-2);
+    right: var(--e-2);
+    padding: 0.1rem 0.55rem;
+    border-radius: 999px;
+    background: #fff1e0;
+    color: #8a4b00;
+    font-size: var(--taille-xs);
+    font-weight: 700;
+  }
+
+  blockquote {
+    margin: var(--e-2) 0 0;
+  }
+
+  blockquote p {
+    color: var(--encre);
+    line-height: 1.6;
+    text-wrap: pretty;
+  }
+
+  figcaption {
+    display: flex;
+    align-items: center;
+    gap: var(--e-2);
+    padding-top: var(--e-2);
+    border-top: 1px solid var(--filet);
+  }
+
+  .portrait {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 3.5rem;
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    background: var(--bleu);
+  }
+
+  .portrait img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .initiales {
+    color: #fff;
+    font-weight: 800;
+    font-stretch: 118%;
+    font-size: var(--taille-l);
+    padding-top: 0.4rem;
+  }
+
+  .identite {
+    display: grid;
+    gap: 0.1rem;
+    font-size: var(--taille-s);
+    color: var(--encre-douce);
+  }
+
+  .identite strong {
+    color: var(--bleu);
+    font-size: var(--taille-m);
+  }
+
+  .poste {
+    font-size: var(--taille-xs);
+  }
+</style>

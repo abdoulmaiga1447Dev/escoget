@@ -9,6 +9,8 @@
  */
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ImageSlot from '../components/ImageSlot.astro';
+import Temoignage from '../components/Temoignage.astro';
+import { temoignages, provisoire } from '../data/temoignages';
 import { etablissement as e } from '../data/etablissement';
 import { formations, niveaux, domaines, compterParNiveau, type Niveau } from '../data/formations';
 
@@ -206,6 +208,26 @@ const defilant = formations.map((f) => ({ texte: f.intitule, niveau: f.niveau, s
         </div>
       </div>
       <a class="lien-discret" href="/vie-estudiantine">Découvrir la vie estudiantine</a>
+    </div>
+  </section>
+
+  <!-- Témoignages des anciens -->
+  <section class="section section-douce">
+    <div class="conteneur">
+      <div class="vie-entete">
+        <h2 class="titre-section" data-revele>Ils ont étudié ici</h2>
+        <p data-revele>Nos anciens étudiants racontent ce que l’Université ESCOGET leur a apporté.</p>
+      </div>
+      <ul class="temoignages">
+        {
+          temoignages.slice(0, 3).map((t) => (
+            <li data-revele>
+              <Temoignage temoignage={t} exemple={provisoire} />
+            </li>
+          ))
+        }
+      </ul>
+      <a class="lien-discret" href="/temoignages">Lire tous les témoignages</a>
     </div>
   </section>
 
@@ -715,6 +737,26 @@ const defilant = formations.map((f) => ({ texte: f.intitule, niveau: f.niveau, s
   .lien-discret {
     font-weight: 700;
     text-underline-offset: 0.25em;
+  }
+
+  /* ---------- Témoignages ---------- */
+  .temoignages {
+    list-style: none;
+    margin: 0 0 var(--e-4);
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--e-3);
+  }
+
+  @media (max-width: 960px) {
+    .temoignages {
+      grid-template-columns: 1fr;
+    }
+
+    .temoignages li:nth-child(n + 3) {
+      display: none;
+    }
   }
 
   /* ---------- Vie estudiantine ---------- */
