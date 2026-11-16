@@ -88,14 +88,9 @@ const itineraire = (requete: string) => `https://www.google.com/maps/search/?api
           e.campus.map((c, i) => (
             <article data-revele>
               <div class="arche cadre-image">
-                <ImageSlot
-                  id={`CON-0${i + 1}`}
-                  format="paysage"
-                  sujet={c.principal ? 'Façade ou entrée du campus de la Riviera Palmeraie' : 'Façade du site du Plateau'}
-                />
+                <ImageSlot id={`CON-0${i + 1}`} format="paysage" sujet="Façade ou entrée du campus de la Riviera Palmeraie" />
               </div>
               <div class="campus-texte">
-                {c.principal && <span class="etiquette">Campus principal</span>}
                 <h3>{c.nom}</h3>
                 <p>{c.adresse.map((l, j) => (j ? <><br />{l}</> : l))}</p>
                 <a href={itineraire(`Université ESCOGET ${c.adresse.join(' ')}`)} target="_blank" rel="noopener">
@@ -171,14 +166,16 @@ const itineraire = (requete: string) => `https://www.google.com/maps/search/?api
     justify-self: start;
   }
 
+  /* Un seul campus : une carte large, la photo à côté de l'adresse */
   .campus {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--e-3);
   }
 
   .campus article {
     display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: center;
     background: #fff;
     border-radius: var(--rayon);
     overflow: hidden;
@@ -204,23 +201,13 @@ const itineraire = (requete: string) => `https://www.google.com/maps/search/?api
     padding: var(--e-3);
   }
 
-  .etiquette {
-    justify-self: start;
-    padding: 0.15rem 0.6rem;
-    border-radius: 999px;
-    background: var(--rouge-clair);
-    color: var(--rouge);
-    font-size: var(--taille-xs);
-    font-weight: 700;
-  }
-
   .campus-texte a {
     font-weight: 650;
   }
 
   @media (max-width: 900px) {
     .zone,
-    .campus {
+    .campus article {
       grid-template-columns: 1fr;
     }
   }

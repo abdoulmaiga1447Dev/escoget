@@ -150,18 +150,13 @@ export const etablissement = {
         'En face des Cours Notre-Dame de la Paix',
         'Abidjan, Cocody',
       ],
-      principal: true,
-    },
-    {
-      nom: 'Site du Plateau',
-      adresse: ['Abidjan, Plateau'], // A_CONFIRMER : adresse précise et activité du site
-      principal: false,
     },
   ],
 
   boitePostale: '01 BP 1368 Abidjan 01, Côte d’Ivoire',
-  telephones: ['+225 27 22 49 49 53', '+225 27 20 32 20 63'], // A_CONFIRMER : numéros contradictoires dans les documents
-  email: 'contact@universite-escoget.ci', // A_CONFIRMER : dépend du futur nom de domaine
+  // Seuls numéros à utiliser (communiqués par l'Université). Ne pas en ajouter d'autres.
+  telephones: ['+225 07 87 05 89 94', '+225 01 41 68 23 12', '+225 05 46 91 14 62'],
+  email: 'infos@universiteescoget.com',
 
   vieEtudiante: {
     bureau: 'ESCOFEDERATION',
@@ -198,7 +193,7 @@ export const etablissement = {
   chiffres: [
     { valeur: '1986', libelle: 'Année de création' },
     { valeur: '35', libelle: 'Formations, du BTS au Master' },
-    { valeur: '1 590', libelle: 'Places sur deux sites' }, // A_CONFIRMER : capacité d’accueil des dossiers d’homologation
+    { valeur: '1 470', libelle: 'Places sur le campus' }, // A_CONFIRMER : capacité du campus de la Riviera Palmeraie selon les dossiers d’homologation
     { valeur: '1987', libelle: 'Reconnu par l’État' },
   ],
 };

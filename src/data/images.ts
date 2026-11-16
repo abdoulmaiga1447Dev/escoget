@@ -16,7 +16,7 @@ export const textesAlternatifs: Record<string, string> = {
   'ACC-08': 'Journées culturelles : étudiants en tenues traditionnelles lors d’un défilé',
   'ACC-09': 'Étudiants concentrés pendant une épreuve en salle de cours',
   'UNI-01': 'Façade du bâtiment de l’Université, avec l’enseigne des instituts IHECG, IHET et CFCP',
-  'CON-01': 'Façade et entrée du campus, derrière sa grille', // A_CONFIRMER : s'agit-il bien du campus de la Riviera Palmeraie ?
+  'CON-01': 'Façade et entrée du campus de la Riviera Palmeraie, derrière sa grille',
   'ADM-01': 'Groupe d’étudiants de l’Université ESCOGET en tenue de l’école',
   'VIE-01': 'Étudiants en polo de l’école lors d’une sortie sur le terrain',
   'VIE-02': 'Un diplômé en toge présente son diplôme devant la bannière ESCOGET',
